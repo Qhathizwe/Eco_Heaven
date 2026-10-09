@@ -7,7 +7,7 @@ export interface User {
     surname: string,
     email: string,
     password: string,
-    phone: number,
+    phone: string,
     role: user_role,
     created_at?: Date, 
 }
