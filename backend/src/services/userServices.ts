@@ -21,7 +21,7 @@ export const createUserTable = async (): Promise<void> => {
         surname VARCHAR(100) NOT NULL,
         email VARCHAR(200) UNIQUE NOT NULL,
         password VARCHAR(100)  NOT NULL,
-        phone INT NOT NULL,
+        phone VARCHAR(20) NOT NULL,
 		role user_role DEFAULT 'user',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`);
