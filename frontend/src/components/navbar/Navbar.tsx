@@ -14,7 +14,7 @@ const Navbar = () => {
       <a href="#stays" className={styles.NavLink}>Stays</a>
       <a href="#philosophy" className={styles.NavLink}>Our Philosophy</a>
 
-      <button onClick={() => navigate('/register')} className={styles.SignInButton}>Sign in</button>
+      <button onClick={() => navigate('/login')} className={styles.SignInButton}>Sign in</button>
     </div>
   )
 }
