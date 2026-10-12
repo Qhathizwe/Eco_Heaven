@@ -1,0 +1,410 @@
+
+.page {
+  --forest: #244d3a;
+  --forest-dark: #173627;
+  --cream: #f8f6ef;
+  --muted: #777d74;
+  --gold: #c5a66b;
+
+  color: #26352b;
+  background: #fff;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.hero {
+  min-height: 650px;
+  height: min(78vh, 800px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #344a39;
+}
+
+.heroImage,
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.heroImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroOverlay {
+  background: linear-gradient(
+    90deg,
+    rgba(15, 32, 23, 0.82) 0%,
+    rgba(15, 32, 23, 0.55) 48%,
+    rgba(15, 32, 23, 0.08) 100%
+  );
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 90%);
+  padding: 70px 0;
+  margin-left: clamp(24px, 9%, 140px);
+  color: white;
+}
+
+.eyebrow,
+.sectionLabel {
+  font-size: 0.76rem;
+  letter-spacing: 3px;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.hero h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -2px;
+  margin: 25px 0;
+}
+
+.hero h1 span {
+  color: #d9c69e;
+  font-style: italic;
+}
+
+.heroContent > p {
+  max-width: 480px;
+  color: #f0f0e8;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 30px;
+}
+
+.findStaysBtn,
+.ctaButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 17px 27px;
+  background: #d6bd8c;
+  color: #203c2c;
+  border: 0;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.findStaysBtn:hover,
+.ctaButton:hover {
+  background: #ead8b3;
+  transform: translateY(-2px);
+}
+
+.findStaysBtn img {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+}
+
+.heroNote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 35px;
+  color: #e5e7df;
+  font-size: 0.85rem;
+}
+
+.heroBadge {
+  position: absolute;
+  z-index: 1;
+  right: 8%;
+  bottom: 12%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 30px;
+  color: white;
+  background: rgba(30, 56, 39, 0.78);
+  border-left: 3px solid var(--gold);
+  backdrop-filter: blur(8px);
+}
+
+.heroBadge span {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+}
+
+.heroBadge strong {
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.intro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 105px 25px 90px;
+  text-align: center;
+}
+
+.intro h2,
+.sectionHeading h2,
+.ctaSection h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 20px 0;
+}
+
+.intro p,
+.ctaSection p {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.9;
+}
+
+.intro p {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.staysSection {
+  padding: 75px clamp(22px, 7%, 110px) 100px;
+  background: var(--cream);
+  scroll-margin-top: 30px;
+}
+
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.sectionHeading h2 {
+  margin-bottom: 0;
+}
+
+.outlineButton {
+  background: transparent;
+  border: 1px solid #c9cec5;
+  border-radius: 4px;
+  padding: 14px 18px;
+  color: var(--forest);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.outlineButton:hover {
+  background: var(--forest);
+  color: white;
+}
+
+.stayGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px;
+}
+
+.stayCard {
+  background: white;
+  overflow: hidden;
+  border: 1px solid #ebe9e1;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.stayCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(32, 52, 38, 0.09);
+}
+
+.stayImageWrapper {
+  height: 250px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stayImageWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.stayCard:hover .stayImageWrapper img {
+  transform: scale(1.05);
+}
+
+.stayTag {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  padding: 8px 12px;
+  background: #f8f6ef;
+  color: var(--forest);
+  font-size: 0.75rem;
+}
+
+.stayInfo {
+  padding: 24px;
+}
+
+.stayLocation {
+  color: #8a8c7e;
+  font-size: 0.8rem;
+}
+
+.stayInfo h3 {
+  font-family: Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+  margin: 12px 0;
+}
+
+.stayInfo p {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.cardLink {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px 0 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #eee;
+  color: var(--forest);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cardLink span {
+  font-size: 1.3rem;
+}
+
+.ctaSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  padding: 75px clamp(22px, 9%, 140px);
+  background: #e9eee6;
+}
+
+.ctaSection h2 {
+  margin-bottom: 10px;
+}
+
+.ctaSection p {
+  margin-bottom: 0;
+}
+
+.footer {
+  padding: 38px 25px;
+  text-align: center;
+  background: #193b2a;
+  color: #f6f4ec;
+}
+
+.footer strong {
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+}
+
+.footer p {
+  color: #d6ddcf;
+}
+
+.footer span {
+  font-size: 0.8rem;
+  color: #bdc9bc;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: 600px;
+  }
+
+  .heroBadge {
+    right: 5%;
+    bottom: 5%;
+  }
+
+  .stayGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sectionHeading {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    height: auto;
+    min-height: 640px;
+  }
+
+  .heroOverlay {
+    background: rgba(15, 32, 23, 0.65);
+  }
+
+  .heroContent {
+    margin: 0 auto;
+    padding: 75px 0 160px;
+  }
+
+  .hero h1 {
+    letter-spacing: -1px;
+  }
+
+  .heroBadge {
+    left: 5%;
+    right: auto;
+    bottom: 24px;
+  }
+
+  .heroNote {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .intro {
+    padding: 75px 24px;
+  }
+
+  .staysSection {
+    padding: 65px 20px;
+  }
+
+  .stayGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stayImageWrapper {
+    height: 240px;
+  }
+
+  .ctaSection {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 60px 24px;
+  }
+}
