@@ -1,91 +1,99 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import {type user_role} from '../../types/app.types'
 
-export interface RegisteredUserForm {
-  name: string;
-  surname: string;
-  email: string;
-  cellNumber: string; 
-  password: string;
+export interface User {
+    id?: string;
+    name: string;
+    surname: string;
+    email: string;
+    password: string;
+    phone: string;
+    role: user_role,
+    created_at?: Date
 }
 
-export interface SavedUser extends RegisteredUserForm {
-  id: string; 
+interface UserState extends User {
+    isLoading: boolean;
+    error: string | null;
 }
 
-interface AuthState {
-  user: SavedUser | null;
-  isSuccess: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-const initialState: AuthState = {
-  user: null,
-  isSuccess: false,
-  isLoading: false,
-  error: null,
+const initialState: UserState = {
+    id: "",
+    name: "",
+    surname: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: "user",
+    isLoading: false,
+    error: null,
 };
 
-export const registerUserThunk = createAsyncThunk<SavedUser, RegisteredUserForm, { rejectValue: string }>(
-  "register/registerUserThunk",
-  async (userData, { rejectWithValue }) => {
-    try {
-      // 1. Validation check: Ensure the email is not already taken on our json-server database
-      const checkEmailResponse = await fetch(`http://localhost:5000/users?email=${encodeURIComponent(userData.email)}`);
-      if (checkEmailResponse.ok) {
-        const existingUsers = await checkEmailResponse.json();
-        if (existingUsers.length > 0) {
-          throw new Error("Le imeyili isivele isetshenziswa (This email is already in use).");
+export const RegisterThunk = createAsyncThunk(
+    "users/RegisterThunk",
+    async (newUser: Omit<User, "id">) => {
+        const response = await fetch(`http://localhost:7000/api/auth/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+        });
+        if (!response.ok) {
+            throw new Error("failed to add user");
         }
-      }
-
-      // 2. Clear to post plain-text creation profile
-      const response = await fetch("http://localhost:5000/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
-      });
-      if (!response.ok) throw new Error("Failed to save credentials to database.");
-      const data: SavedUser = await response.json();
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Something went wrong");
-    }
-  }
+        const data = await response.json();
+        return data;
+    },
 );
 
-const registerSlice = createSlice({
-  name: "register",
-  initialState,
-  reducers: {
-    resetRegisterState: (state) => {
-      state.user = null;
-      state.isSuccess = false;
-      state.isLoading = false;
-      state.error = null;
+export const RegisterSlice = createSlice({
+    name: "register",
+    initialState,
+    reducers: {
+        AddName: (state, action: PayloadAction<string>) => {
+            state.name = action.payload;
+        },
+        AddSurname: (state, action: PayloadAction<string>) => {
+            state.surname = action.payload;
+        },
+        AddEmailAddress: (state, action: PayloadAction<string>) => {
+            state.email = action.payload;
+        },
+        AddPassword: (state, action: PayloadAction<string>) => {
+            state.password = action.payload;
+        },
+        AddPhone: (state, action: PayloadAction<string>) => {
+            state.phone = action.payload;
+        },
+        AddRole: (state, action: PayloadAction<user_role>) => {
+            state.role = action.payload;
+        },
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(registerUserThunk.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-        state.isSuccess = false;
-      })
-      .addCase(registerUserThunk.fulfilled, (state, action: PayloadAction<SavedUser>) => {
-        state.isLoading = false;
-        state.isSuccess = true;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(registerUserThunk.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isSuccess = false;
-        state.user = null;
-        state.error = action.payload ?? "An unknown error occurred";
-      });
-  },
+    extraReducers: (builder) => {
+        builder.addCase(RegisterThunk.pending, (state) => {
+            state.isLoading = true;
+            state.error = null;
+        });
+        builder.addCase(RegisterThunk.fulfilled, (state) => {
+            state.isLoading = false;
+        });
+        builder.addCase(RegisterThunk.rejected, (state, action) => {
+            state.isLoading = false;
+            state.error = action.payload as string;
+        });
+    },
 });
 
-export const { resetRegisterState } = registerSlice.actions;
-export default registerSlice.reducer;
+export const {
+    AddName,
+    AddSurname,
+    AddEmailAddress,
+    AddPassword,
+    AddPhone,
+    AddRole,
+} = RegisterSlice.actions;
+
+export default RegisterSlice.reducer;
