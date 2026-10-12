@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 // import { updateProfileData } from './ProfileSlice'; 
+import {type user_role} from '../../types/app.types'
 
 export interface User {
   id: string;
@@ -7,7 +8,8 @@ export interface User {
   surname?: string;
   email: string;
   password: string; 
-  cellNumber?: string;
+  phone?: string;
+  role: user_role;
 }
 
 interface AuthState {
@@ -21,6 +23,8 @@ const initialState: AuthState = {
   form: {
     email: '',
     password: '',
+    role: 'user'
+
   },
   user: null,
   isLoading: false,
@@ -78,19 +82,21 @@ const loginSlice = createSlice({
   name: 'login',
   initialState,
   reducers: {
+       // FIX: Redefined the action payload structure cleanly without duplicate keys
     updateLoginField: (
       state,
-      action: PayloadAction<{ field: keyof AuthState['form']; value: string }>
+      action: PayloadAction<{ field: keyof AuthState['form']; value: string | user_role }>
     ) => {
-      state.form[action.payload.field] = action.payload.value;
+      // Use type assertion to satisfy the safe union indexing rule in TypeScript
+      (state.form as any)[action.payload.field] = action.payload.value;
     },
     resetLoginForm: (state) => {
-      state.form = { email: '', password: '' };
+      state.form = { email: '', password: '', role: 'user' };
       state.error = null;
     },
     logOut: (state) => {
       state.user = null;
-      state.form = { email: '', password: '' };
+      state.form = { email: '', password: '', role: 'user' };
       state.error = null;
     }
   },
@@ -104,7 +110,7 @@ const loginSlice = createSlice({
         state.isLoading = false;
         state.user = action.payload; 
         state.error = null;
-        state.form = { email: '', password: '' }; 
+        state.form = { email: '', password: '', role: 'user' }; 
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.isLoading = false;
