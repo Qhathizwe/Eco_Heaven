@@ -1,22 +1,43 @@
-import styles from './Navbar.module.css'
-import logo from '../../assets/hotel-logo 2.jpg'
 
-import { useNavigate } from 'react-router-dom'
-
+import { Link, useNavigate } from "react-router-dom";
+import styles from "./Navbar.module.css";
+import logo from "../../assets/hotel-logo 2.jpg";
 
 const Navbar = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
-     <div className={styles.NavbarContainer}>
-      <img src={logo} alt="Logo" className={styles.Logo} />
+    <header className={styles.NavbarContainer}>
+      <Link to="/" className={styles.brand} aria-label="WildHaven home">
+        <img src={logo} alt="WildHaven logo" className={styles.Logo} />
+      </Link>
 
-      <a href="#stays" className={styles.NavLink}>Stays</a>
-      <a href="#philosophy" className={styles.NavLink}>Our Philosophy</a>
+      <nav className={styles.NavLinks} aria-label="Main navigation">
+        <a href="/#stays" className={styles.NavLink}>
+          Stays
+        </a>
+        <a href="/#philosophy" className={styles.NavLink}>
+          Our Philosophy
+        </a>
+      </nav>
 
-      <button onClick={() => navigate('/login')} className={styles.SignInButton}>Sign in</button>
-    </div>
-  )
-}
+      <div className={styles.Actions}>
+        <button
+          onClick={() => navigate("/login")}
+          className={styles.SignInButton}
+        >
+          Sign in
+        </button>
 
-export default Navbar
+        <button
+          onClick={() => navigate("/register")}
+          className={styles.SignUpButton}
+        >
+          Join us
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;
