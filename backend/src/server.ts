@@ -10,10 +10,12 @@ import userRouter from "./routes/userRoutes";
 dotenv.config();
 
 const app = express();
+const cors = require('cors'); 
 
 const PORT = process.env.PORT || 7000;
 
 const startServer = async () => {
+    app.use(cors()); 
     app.use(express.json());
     await DBConnection()
 
