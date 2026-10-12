@@ -1,0 +1,432 @@
+
+.dashboard {
+  --forest: #244d3a;
+  --cream: #f7f7f1;
+  --muted: #858b81;
+
+  display: flex;
+  min-height: 100vh;
+  color: #27382d;
+  background: var(--cream);
+  font-family: Inter, Arial, sans-serif;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 245px;
+  padding: 35px 22px;
+  background: #fff;
+  border-right: 1px solid #e8e9e1;
+}
+
+.brand {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  color: var(--forest);
+  margin: 0 0 45px 8px;
+}
+
+.sidebarLabel,
+.muted {
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+}
+
+.sidebarLabel {
+  margin: 0 0 15px 10px;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.navigation a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 13px;
+  color: #677268;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.94rem;
+}
+
+.navigation a span {
+  font-size: 1.25rem;
+}
+
+.navigation a:hover,
+.navigation .activeLink {
+  color: var(--forest);
+  background: #eaf0e8;
+}
+
+.sidebarButton {
+  margin-top: auto;
+  padding: 13px 8px;
+  background: transparent;
+  color: var(--forest);
+  border: 1px solid #dce2d8;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 36px clamp(20px, 4vw, 55px);
+}
+
+.topbar,
+.panelHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.topbar {
+  margin-bottom: 30px;
+}
+
+.topbar h1 {
+  margin: 8px 0 0;
+  font-family: Georgia, serif;
+  font-size: 2.3rem;
+  font-weight: 400;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  color: #314235;
+  background: white;
+  border: 1px solid #e6e8df;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: white;
+  background: var(--forest);
+  border-radius: 50%;
+}
+
+.welcomeCard {
+  min-height: 270px;
+  display: flex;
+  align-items: center;
+  padding: 42px;
+  color: white;
+  background:
+    linear-gradient(90deg, rgba(22, 48, 33, 0.95), rgba(22, 48, 33, 0.5)),
+    url("../../assets/hero-image.jpg") center 50% / cover;
+  border-radius: 10px;
+}
+
+.welcomeCard > div {
+  max-width: 570px;
+}
+
+.welcomeEyebrow {
+  color: #dbc89c;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+}
+
+.welcomeCard h2 {
+  margin: 15px 0;
+  font-family: Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+}
+
+.welcomeCard p {
+  max-width: 450px;
+  color: #e3e8df;
+  line-height: 1.7;
+}
+
+.primaryButton {
+  padding: 13px 18px;
+  color: white;
+  background: var(--forest);
+  border: 0;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.welcomeCard .primaryButton {
+  margin-top: 12px;
+  color: #233d2c;
+  background: #d9c69e;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.statCard,
+.panel {
+  background: white;
+  border: 1px solid #e8e9e1;
+  border-radius: 8px;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+}
+
+.statCard > span {
+  color: #747b71;
+  font-size: 0.9rem;
+}
+
+.statCard strong {
+  font-family: Georgia, serif;
+  font-size: 2.1rem;
+  font-weight: 400;
+}
+
+.statCard small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.panel {
+  padding: 27px;
+}
+
+.panelHeading h2 {
+  margin: 8px 0 0;
+  font-family: Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+}
+
+.textButton {
+  color: var(--forest);
+  background: transparent;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bookingList {
+  margin-top: 25px;
+}
+
+.bookingRow {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 20px 0;
+  border-top: 1px solid #eeeee8;
+}
+
+.bookingIcon,
+.quickIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  color: var(--forest);
+  background: #edf2e9;
+  border-radius: 8px;
+  font-size: 1.5rem;
+}
+
+.bookingDetails {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bookingDetails strong {
+  font-size: 0.98rem;
+}
+
+.bookingDetails span,
+.bookingDetails small {
+  color: var(--muted);
+  font-size: 0.83rem;
+}
+
+.status {
+  padding: 7px 11px;
+  color: #8a6729;
+  background: #faf0d9;
+  border-radius: 30px;
+  font-size: 0.8rem;
+}
+
+.emptyState {
+  padding: 35px 10px;
+  text-align: center;
+}
+
+.emptyState > span {
+  color: #8d9f8b;
+  font-size: 2.3rem;
+}
+
+.emptyState h3 {
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.emptyState p {
+  color: var(--muted);
+}
+
+.quickLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.quickLinks article {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #e8e9e1;
+  border-radius: 8px;
+}
+
+.quickLinks article > div {
+  flex: 1;
+}
+
+.quickLinks h3 {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+}
+
+.quickLinks p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.quickLinks button {
+  padding: 8px;
+  color: var(--forest);
+  background: transparent;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 200px;
+    padding: 28px 14px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .quickLinks {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+    border-right: 0;
+    border-bottom: 1px solid #e8e9e1;
+  }
+
+  .brand {
+    margin: 0 0 15px;
+  }
+
+  .sidebarLabel {
+    display: none;
+  }
+
+  .navigation {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .navigation a {
+    padding: 10px;
+    font-size: 0.82rem;
+  }
+
+  .sidebarButton {
+    margin-top: 12px;
+  }
+
+  .main {
+    padding: 25px 15px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar h1 {
+    font-size: 1.8rem;
+  }
+
+  .profileButton {
+    font-size: 0;
+  }
+
+  .welcomeCard {
+    padding: 27px 22px;
+  }
+
+  .panel {
+    padding: 20px 15px;
+  }
+
+  .panelHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bookingRow {
+    flex-wrap: wrap;
+  }
+
+  .status {
+    margin-left: 65px;
+  }
+}
