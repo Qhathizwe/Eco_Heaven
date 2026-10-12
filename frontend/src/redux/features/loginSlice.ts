@@ -28,37 +28,51 @@ const initialState: AuthState = {
 };
 
 // DIRECT FETCH PIPELINE: Queries json-server for exact matching credentials
-export const loginUserThunk = createAsyncThunk<User, AuthState['form']>(
+export const loginUserThunk = createAsyncThunk<any, AuthState['form']>(
   'auth/loginUserThunk',
   async (loginCredentials, thunkAPI) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/users?email=${encodeURIComponent(loginCredentials.email)}&password=${encodeURIComponent(loginCredentials.password)}`
-      );
+      // 1. Point clean URL to the base endpoint path without messy URL queries
+      const response = await fetch(`http://localhost:7000/api/auth/login`, {
+        method: 'POST', // 2. Change the method to POST to match router.post()
+        headers: {
+          'Content-Type': 'application/json', // 3. Inform Express to use express.json() middleware
+        },
+        // 4. Pass credentials structured neatly inside the body
+        body: JSON.stringify({
+          email: loginCredentials.email,
+          password: loginCredentials.password
+        }), 
+      });
 
+      // Handle invalid email or password statuses (401) explicitly
+      if (response.status === 401) {
+        throw new Error('Faka izimfaneko zakhona ezilungile! (Incorrect credentials)');
+      }
+
+      // Handle standard server crashes or bad routing paths
       if (!response.ok) {
-        throw new Error('kukhona inkinga kwi server yakho.');
+        throw new Error('Kukhona inkinga kwi server yakho.');
       }
 
-      const users: User[] = await response.json();
+      // 5. Destructure the login payload payload sent from your controller ({ message, token })
+      const data = await response.json();
 
-      // 1. Explicitly check if a user was found in the database array
-      const matchingUser = users.find((user) => 
-        user.email === loginCredentials.email && user.password === loginCredentials.password
-      );
+      if (!data || !data.token) {
+        throw new Error('Faka izimfaneko zakhona!');
+      }
 
+      // 6. Persist the generated JSON Web Token locally
+      localStorage.setItem("Token", data.token);
       
-      if (!matchingUser) {
-        throw new Error('faka izimfaneko zakhona!');
-      }
-
-      localStorage.setItem("User", JSON.stringify(matchingUser));
-      return matchingUser; 
+      return data; 
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Kukhona Okungahambi kahle lungisa umsamu.');
     }
   }
 );
+
+
 
 const loginSlice = createSlice({
   name: 'login',
@@ -96,18 +110,7 @@ const loginSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string; 
       })
-      // Syncs state instantly when changes are made inside Profile.tsx
-    //   .addCase(updateProfileData.fulfilled, (state, action: PayloadAction<any>) => {
-    //     if (state.user) {
-    //       state.user.name = action.payload.name;
-    //       state.user.surname = action.payload.surname;
-    //       state.user.email = action.payload.email;
-    //       state.user.password = action.payload.password;
-    //       if (action.payload.cellNumber) {
-    //         state.user.cellNumber = action.payload.cellNumber;
-    //       }
-    //     }
-    //   });
+  
   }
 });
 
