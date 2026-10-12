@@ -36,16 +36,17 @@ export const loginUserThunk = createAsyncThunk<any, AuthState['form']>(
   'auth/loginUserThunk',
   async (loginCredentials, thunkAPI) => {
     try {
-      // 1. Point clean URL to the base endpoint path without messy URL queries
+      
       const response = await fetch(`http://localhost:7000/api/auth/login`, {
-        method: 'POST', // 2. Change the method to POST to match router.post()
+        method: 'POST', 
         headers: {
-          'Content-Type': 'application/json', // 3. Inform Express to use express.json() middleware
+          'Content-Type': 'application/json', 
         },
-        // 4. Pass credentials structured neatly inside the body
+    
         body: JSON.stringify({
           email: loginCredentials.email,
-          password: loginCredentials.password
+          password: loginCredentials.password,
+          role: loginCredentials.role
         }), 
       });
 
@@ -59,15 +60,16 @@ export const loginUserThunk = createAsyncThunk<any, AuthState['form']>(
         throw new Error('Kukhona inkinga kwi server yakho.');
       }
 
-      // 5. Destructure the login payload payload sent from your controller ({ message, token })
+      // ({ message, token, role })
       const data = await response.json();
 
       if (!data || !data.token) {
         throw new Error('Faka izimfaneko zakhona!');
       }
 
-      // 6. Persist the generated JSON Web Token locally
+      
       localStorage.setItem("Token", data.token);
+      localStorage.setItem("Role", data.role);
       
       return data; 
     } catch (error: any) {
@@ -82,12 +84,12 @@ const loginSlice = createSlice({
   name: 'login',
   initialState,
   reducers: {
-       // FIX: Redefined the action payload structure cleanly without duplicate keys
+
     updateLoginField: (
       state,
       action: PayloadAction<{ field: keyof AuthState['form']; value: string | user_role }>
     ) => {
-      // Use type assertion to satisfy the safe union indexing rule in TypeScript
+    
       (state.form as any)[action.payload.field] = action.payload.value;
     },
     resetLoginForm: (state) => {
