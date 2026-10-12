@@ -16,15 +16,17 @@ const Login = () => {
         (state: RootState) => state.register
     )
 
-    // Bind directly to your exact Redux Slice state fields
+
     const { form, isLoading, error } = useSelector((state: RootState) => state.login);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log('⏳ Attempting authentication with:', form);
 
-        // Dispatch your exact pipeline thunk with the current Redux credentials state
+        console.log(' Attempting authentication with:', form);
         const result = await dispatch(loginUserThunk(form));
+
+        const userRole = result.payload.role;
+
 
         console.log('Login response package:', result);
 
@@ -32,8 +34,12 @@ const Login = () => {
             console.log(' Auth lifecycle complete.');
             alert('Welcome back!');
 
-            navigate('/dashboard');
-            // 👈 Change this to your authenticated route
+            if (userRole === 'admin') {
+                navigate('/admin-dashboard');
+            } else {
+                navigate('/user-dashboard')
+            }
+
         } else if (loginUserThunk.rejected.match(result)) {
             console.error(' Authentication aborted:', result.payload || result.error.message);
             alert(`Login failed: ${result.payload || "Faka izimfaneko zakhona!"}`);
@@ -47,7 +53,6 @@ const Login = () => {
                     Please <span className={styles.tGreen}>Login</span> Your Account
                 </h1>
 
-                {/* Displays the server errors or custom Zulu exception messages from your slice */}
                 {error && <p style={{ color: 'red', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>}
 
                 <input
@@ -55,7 +60,6 @@ const Login = () => {
                     placeholder="Enter Your email"
                     className={styles.loginInput}
                     value={form.email}
-                    // FIX: Wrapped the arguments correctly into a single object payload or matched your slice
                     onChange={(e) => dispatch(updateLoginField({ field: 'email', value: e.target.value }))}
                     required
                 />
@@ -65,7 +69,6 @@ const Login = () => {
                     placeholder="Enter Your Password"
                     className={styles.loginInput}
                     value={form.password}
-                    // FIX: Wrapped the arguments correctly into a single object payload or matched your slice
                     onChange={(e) => dispatch(updateLoginField({ field: 'password', value: e.target.value }))}
                     required
                 />
@@ -74,7 +77,7 @@ const Login = () => {
                 <select
                     name="role"
                     className={styles.inputFull}
-                    value={form.role} // Tied directly to the login slice form state now
+                    value={form.role}
                     onChange={(e) => dispatch(updateLoginField({ field: 'role', value: e.target.value as user_role }))}
                     required
                 >
