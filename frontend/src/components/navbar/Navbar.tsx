@@ -1,7 +1,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-import logo from "../../assets/hotel-logo 2.jpg";
+import logo from "../../assets/wildhaven.jpg";
 
 const Navbar = () => {
   const navigate = useNavigate();
