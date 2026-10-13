@@ -1,4 +1,4 @@
-
+//=========== Users ===================//
 export type user_role = "admin" | "user";
 
 export interface User {
@@ -12,3 +12,20 @@ export interface User {
     created_at?: Date, 
 }
  export type new_user = Omit<User, 'id' >;
+
+ //=========== Accomodations ===================//
+
+export interface Accomodations {
+    id: number,
+    name: string,
+    description?: string,
+    address: string,
+    amenities: string[],
+    star_rating: number,
+    updated_at?: Date,
+    pictures?: string[],
+    province: string,
+    rooms?: string[]
+};
+export type new_accomodation = Omit<Accomodations, 'id' >;
+
