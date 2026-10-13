@@ -1,7 +1,7 @@
 
 .dashboard {
   --forest: #244d3a;
-  --cream: #f7f7f1;
+  --cream: #f7f7f1;                                    
   --muted: #858b81;
 
   display: flex;
@@ -17,14 +17,14 @@
   flex-shrink: 0;
   width: 245px;
   padding: 35px 22px;
-  background: #fff;
+  background: #244d3a;
   border-right: 1px solid #e8e9e1;
 }
 
 .brand {
   font-family: Georgia, serif;
-  font-size: 1.9rem;
-  color: var(--forest);
+  font-size: 2.25rem;
+  color: var(--cream);
   margin: 0 0 45px 8px;
 }
 
@@ -37,6 +37,8 @@
 
 .sidebarLabel {
   margin: 0 0 15px 10px;
+  color: var(--cream);
+  font-size: 1rem;
 }
 
 .navigation {
@@ -50,7 +52,7 @@
   align-items: center;
   gap: 13px;
   padding: 13px;
-  color: #677268;
+  color: var(--cream);
   border-radius: 5px;
   text-decoration: none;
   font-size: 0.94rem;
@@ -70,7 +72,7 @@
   margin-top: auto;
   padding: 13px 8px;
   background: transparent;
-  color: var(--forest);
+  color: var(--cream);
   border: 1px solid #dce2d8;
   border-radius: 5px;
   cursor: pointer;
