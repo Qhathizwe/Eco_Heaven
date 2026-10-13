@@ -1,14 +1,14 @@
 
 .NavbarContainer {
   position: relative;
-  z-index: 10;
+  z-index: 500;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 28px;
   min-height: 88px;
   padding: 12px clamp(20px, 6%, 90px);
-  background: #fff;
+  background: #e6dcc1;
   border-bottom: 1px solid #eeeee7;
 }
 
@@ -20,9 +20,10 @@
 
 .Logo {
   display: block;
-  width: 155px;
-  height: 60px;
-  object-fit: contain;
+  width: 300px;
+  height: 130px;
+  border-radius: 99px;
+
 }
 
 .NavLinks,
@@ -34,8 +35,8 @@
 
 .NavLink {
   color: #35443a;
-  font-size: 0.94rem;
-  font-weight: 500;
+  font-size: 1.125rem;
+  font-weight: 800;
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -50,10 +51,12 @@
 
 .SignInButton,
 .SignUpButton {
+  width: 200px;
+  height: 60px;
   padding: 12px 19px;
   border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 700;
   cursor: pointer;
   transition: 0.2s;
 }
