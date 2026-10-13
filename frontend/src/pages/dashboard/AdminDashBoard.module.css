@@ -2,6 +2,7 @@
 .adminLayout {
   --forest: #244d3a;
   --muted: #858b81;
+  --cream: #f7f7f1;
 
   display: flex;
   min-height: 100vh;
@@ -16,13 +17,13 @@
   flex-shrink: 0;
   width: 245px;
   padding: 35px 22px;
-  background: #fff;
+  background: var(--forest);
   border-right: 1px solid #e8e9e1;
 }
 
 .brand {
   margin: 0 0 45px 8px;
-  color: var(--forest);
+  color: var(--cream);
   font-family: Georgia, serif;
   font-size: 1.9rem;
 }
@@ -37,6 +38,8 @@
 
 .adminLabel {
   margin: 0 0 15px 10px;
+  color: var(--cream);
+  font-size: 1rem;
 }
 
 .nav {
@@ -50,7 +53,7 @@
   align-items: center;
   gap: 13px;
   padding: 13px;
-  color: #677268;
+  color: var(--cream);
   border-radius: 5px;
   text-decoration: none;
   font-size: 0.94rem;
@@ -58,18 +61,19 @@
 
 .nav a span {
   font-size: 1.25rem;
+  color: var(--cream);
 }
 
 .nav a:hover,
 .nav .active {
   color: var(--forest);
-  background: #eaf0e8;
+  background: #e9e395;
 }
 
 .backButton {
   margin-top: auto;
   padding: 13px 8px;
-  color: var(--forest);
+  color: var(--cream);
   background: transparent;
   border: 1px solid #dce2d8;
   border-radius: 5px;
