@@ -68,3 +68,55 @@ export const loginUser = async(req: Request, res: Response) =>{
     }
 };
 
+export const getAllUsers = async (req: Request, res: Response) => {
+    try {
+        const users = await userServices.findAllUsers()
+        res.status(200).json(users)
+    } catch (error) {
+        res.status(500).json({ message: "Error Retrieving Users" })
+    };
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id as string)
+        const user = await userServices.findUserById(id)
+
+        if (!user) {
+            return res.status(404).json("User not found")
+        }
+        res.status(200).json(user)
+    } catch (error) {
+
+        res.status(500).json({ message: "Error Retrieving Users by ID" })
+    }
+};
+
+export const updateUserById = async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id as string)
+        const updateUser = await userServices.updateUser(id, req.body)
+        if (!updateUser) {
+            return res.status(404).json("User not found")
+        }
+        return res.status(200).json("User updated succesfully")
+    } catch (error) {
+
+         console.error(error);
+        res.status(500).json({ message: "Error Retrieving Users by ID" })
+    };
+};
+
+export const deleteUserById = async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id as string);
+        const deleteUser = await userServices.deleteUser(id);
+        if (!deleteUser) {
+            return res.status(404).json("User not found");
+        }
+        return res.status(200).json({message: "User deleted succesfully!"});
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting Users by ID" }) 
+    }
+};
+
