@@ -107,9 +107,9 @@ export const updateAccomodation = async (id: number, accomodationData: Partial<n
 
 
 
-export const deleteAccomodation = async (id: number): Promise<boolean> => {
+export const deleteAccomodation = async (id: number): Promise<Accomodations | null> => {
     const { rows } = await query(
-        "DELETE FROM accomodations WHERE id = $1", [id]
+        "DELETE FROM accomodations WHERE id = $1 RETURNING *", [id]
     );
     return rows[0] || null;
 }
