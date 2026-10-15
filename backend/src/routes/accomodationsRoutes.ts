@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {upload} from '../middleware/uploadMiddleware'
 import {
     createAccomodationController,
     getAllAccomodationsController,
@@ -7,17 +8,17 @@ import {
     getAccomodationByProvinceController,
     updateAccomodationController,
     deleteAccomodationController
-}
-from '../controllers/accomodationControllers'
+} from '../controllers/accomodationControllers';
 
-const router = Router()
+const router = Router();
 
-router.post('/accomodation', createAccomodationController)
-router.get('/accomodations', getAllAccomodationsController)
-router.get('/accomodations/:id', getAccomodationByIdController)
-router.get('/accomodations/name/:name', getAccomodationByNameController)
-router.get('/accomodations/province/:province', getAccomodationByProvinceController)
-router.put('/accomodation/:id', updateAccomodationController)
-router.delete('/accomodation/:id', deleteAccomodationController)
 
-export default router
+router.post('/accomodation', upload.array('pictures', 5), createAccomodationController);
+router.get('/accomodations', getAllAccomodationsController);
+router.get('/accomodations/:id', getAccomodationByIdController);
+router.get('/accomodations/name/:name', getAccomodationByNameController);
+router.get('/accomodations/province/:province', getAccomodationByProvinceController);
+router.put('/accomodations/:id', updateAccomodationController);
+router.delete('/accomodations/:id', deleteAccomodationController);
+
+export default router;
