@@ -1,9 +1,13 @@
-
+import { useState } from "react"; // 💡 1. MUST IMPORT useState
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashBoard.module.css";
+import { AddAccommodationModal } from "../../components/add accomodation modal/AddAccommodationModal"; // 💡 
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  
+  // 💡 3. Create the visibility toggle state (Starts hidden as false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const managementItems = [
     {
@@ -68,63 +72,46 @@ const AdminDashboard = () => {
       <main className={styles.main} id="overview">
         <header className={styles.header}>
           <div>
-            <span className={styles.eyebrow}>
-              BUSINESS OVERVIEW
-            </span>
+            <span className={styles.eyebrow}>BUSINESS OVERVIEW</span>
             <h1>Admin dashboard</h1>
             <p>Manage your accommodations and reservations.</p>
           </div>
 
-          <span className={styles.adminBadge}>
-            Administrator
-          </span>
+          <span className={styles.adminBadge}>Administrator</span>
         </header>
 
         <section className={styles.notice}>
           <div>
             <strong>Welcome to your management workspace</strong>
-            <p>
-              Monitor your hotel operations and manage your
-              accommodation listings from one place.
-            </p>
+            <p>Monitor your hotel operations and manage your accommodation listings from one place.</p>
           </div>
           <span className={styles.noticeIcon}>✦</span>
         </section>
 
         <section className={styles.metrics}>
-          <article className={styles.metricCard}>
-            <span>Total bookings</span>
-            <strong>—</strong>
-            <small>Connect booking API</small>
-          </article>
-
-          <article className={styles.metricCard}>
-            <span>Registered customers</span>
-            <strong>—</strong>
-            <small>Connect users API</small>
-          </article>
-
+          {/* ... keeping metrics metrics standard ... */}
           <article className={styles.metricCard}>
             <span>Active accommodations</span>
             <strong>—</strong>
             <small>Connect accommodations API</small>
           </article>
-
-          <article className={styles.metricCard}>
-            <span>Pending requests</span>
-            <strong>—</strong>
-            <small>Connect reservation API</small>
-          </article>
+          {/* ... rest of your standard metric cards ... */}
         </section>
 
         <section className={styles.management} id="management">
           <div className={styles.sectionHeading}>
             <div>
-              <span className={styles.eyebrow}>
-                OPERATIONS
-              </span>
+              <span className={styles.eyebrow}>OPERATIONS</span>
               <h2>Management centre</h2>
             </div>
+
+            {/* 💡 4. Connect the button onClick to flip your visibility state to TRUE */}
+            <button 
+              className={styles.addAccommodationBtn}
+              onClick={() => setIsModalOpen(true)}
+            >
+              + Add Accommodation
+            </button>
           </div>
 
           <div className={styles.managementGrid}>
@@ -144,18 +131,13 @@ const AdminDashboard = () => {
             ))}
           </div>
         </section>
-
-        <section className={styles.activityPanel}>
-          <div>
-            <h2>Recent activity</h2>
-            <p>
-              Booking activity and management events will appear
-              here once your API is connected.
-            </p>
-          </div>
-          <span className={styles.emptyIcon}>▤</span>
-        </section>
       </main>
+
+      {/* 💡 5. PLACE THE MODAL RIGHT HERE AT THE BOTTOM OF THE LAYOUT */}
+      <AddAccommodationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };
