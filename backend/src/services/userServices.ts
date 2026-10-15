@@ -76,6 +76,15 @@ export const findUserByEmail = async (email: string):
     return rows[0] || null;
 };
 
+//2.4 find User by Role
+export const findUserByRole = async (role: user_role):
+    Promise<User[]> => {
+    const { rows } = await query(
+        "SELECT * FROM Users WHERE role = $1", [role]
+    )
+    return rows || [];
+};
+
 //3. Update User
 export const updateUser = async (id: number, userData: Partial<User>):
     Promise<User | null> => {
