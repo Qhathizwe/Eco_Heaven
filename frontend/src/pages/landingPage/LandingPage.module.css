@@ -336,6 +336,47 @@
   color: #bdc9bc;
 }
 
+/* ==========================================================================
+   Server State Containers (Loading Shimmers & Empty States)
+   ========================================================================== */
+
+/* Spans across all three column slots in your CSS Grid layout beautifully */
+.loadingContainer, 
+.emptyContainer {
+  grid-column: 1 / -1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 24px;
+  background: var(--cream);
+  border: 1px dashed #c9cec5;
+  border-radius: 6px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.loadingContainer p,
+.emptyContainer p {
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--forest);
+  margin: 0;
+}
+
+/* Optional: Elegant keyframe animation pulse shimmer effect during retrieval load */
+.loadingContainer {
+  animation: pulseShimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes pulseShimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+
 @media (max-width: 900px) {
   .hero {
     min-height: 600px;
