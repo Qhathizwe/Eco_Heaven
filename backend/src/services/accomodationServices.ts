@@ -24,15 +24,40 @@ export const createAccomodationTable = async (): Promise<void> => {
     }
 };
 
-export const createAccomdation = async (accomodationData: new_accomodation):
-    Promise<Accomodations> => {
+
+
+export const createAccomdation = async (accomodationData: any) => {
     const { name, description, address, amenities, star_rating, pictures, province, rooms } = accomodationData;
-    const { rows } = await query(
-        "INSERT INTO accomodations (name, description, address, amenities, star_rating, pictures, province, rooms) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-        [name, description, address, amenities, star_rating, pictures, province, rooms]
-    );
+
+    // Ensure array fields are strictly arrays. If a single string slips in, wrap it inside brackets [].
+    const cleanAmenities = Array.isArray(amenities) ? amenities : [amenities].filter(Boolean);
+    const cleanPictures = Array.isArray(pictures) ? pictures : [pictures].filter(Boolean);
+    const cleanRooms = Array.isArray(rooms) ? rooms : [rooms].filter(Boolean);
+
+    const values = [
+        name,
+        description || "",
+        address,
+        cleanAmenities, 
+        Number(star_rating),
+        cleanPictures,  
+        province,
+        cleanRooms
+    ];
+
+     const { rows } = await query (
+     `
+        INSERT INTO accomodations (name, description, address, amenities, star_rating, pictures, province, rooms)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *;
+    `,values 
+     )
+
+    
+
     return rows[0];
 };
+
 
 export const findAllAccomodations = async (): Promise<Accomodations[]> => {
     const { rows } = await query(
