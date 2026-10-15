@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from 'dotenv';
 
+
 import { DBConnection } from "./config/database";
 
 import { createUserTable } from "./services/userServices";
@@ -26,8 +27,9 @@ const startServer = async () => {
         await createUserTable()
         await createAccomodationTable()
     }
-    createTables()
 
+    await createTables()
+    
     app.use("/api", userRouter)
     app.use("/api", accomodationRouter)
 
