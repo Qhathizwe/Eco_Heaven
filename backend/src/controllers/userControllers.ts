@@ -44,11 +44,14 @@ export const createUserController = async (req: Request, res: Response) => {
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
     if (!email || !password) {
         return res.status(400).json({ message: "Email and Password is required" })
     }
+
+
     try {
+       
         const user = await userServices.findUserByEmail(email);
 
         if (!user) {
@@ -59,6 +62,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid password" });
+        }
+          // 4. CRUCIAL STEP: Validate that their chosen role matches their actual DB role
+        if (user.role !== role) {
+            return res.status(403).json({ 
+                message: "Unauthorized: The selected role does not match this account." 
+            });
         }
         const payload = {
             userId: user.id,
@@ -116,7 +125,7 @@ export const updateUserById = async (req: Request, res: Response) => {
         return res.status(200).json("User updated succesfully")
     } catch (error) {
 
-         console.error(error);
+        console.error(error);
         res.status(500).json({ message: "Error Retrieving Users by ID" })
     };
 };
@@ -128,9 +137,9 @@ export const deleteUserById = async (req: Request, res: Response) => {
         if (!deleteUser) {
             return res.status(404).json("User not found");
         }
-        return res.status(200).json({message: "User deleted succesfully!"});
+        return res.status(200).json({ message: "User deleted succesfully!" });
     } catch (error) {
-        res.status(500).json({ message: "Error deleting Users by ID" }) 
+        res.status(500).json({ message: "Error deleting Users by ID" })
     }
 };
 
