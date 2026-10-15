@@ -105,7 +105,7 @@ export const deleteAccomodationThunk = createAsyncThunk(
     'accomodation/deleteAccomodation',
     async (id: number, thunkAPI) => {
         try {
-            const response = await fetch(`${API_URL}/${id}`, {
+            const response = await fetch(`${API_URL}/accomodations/${id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error('Failed to delete accommodation');
