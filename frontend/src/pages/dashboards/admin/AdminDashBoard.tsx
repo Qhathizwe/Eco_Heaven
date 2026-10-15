@@ -1,12 +1,12 @@
 import { useState } from "react"; // 💡 1. MUST IMPORT useState
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashBoard.module.css";
-import { AddAccommodationModal } from "../../components/add accomodation modal/AddAccommodationModal"; // 💡 
+import { AddAccommodationModal } from "../../../components/add accomodation modal/AddAccommodationModal"; // 💡 
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   
-  // 💡 3. Create the visibility toggle state (Starts hidden as false)
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const managementItems = [

@@ -1,8 +1,8 @@
 import LandingPage from './pages/landingPage/LandingPage'
 import Register from './pages/register/RegisterPage'
 import LoginPage from './pages/login/LoginPage'
-import AdminDashboard from './pages/dashboard/AdminDashBoard'
-import UserDashboard from './pages/dashboard/UserDashboard'
+import AdminDashboard from './pages/dashboards/admin/AdminDashBoard'
+import UserDashboard from './pages/dashboards/user/UserDashboard'
 
 
 import { Route, Routes, } from 'react-router-dom'
