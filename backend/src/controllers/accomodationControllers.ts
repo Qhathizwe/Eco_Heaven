@@ -14,22 +14,55 @@ import dotenv from 'dotenv'
 
 dotenv.config();
 
-export const createAccomodationController = async (req: Request, res: Response) =>{
-    const {name, description, address, amenities, star_rating, pictures, province, rooms} = req.body;
-    if (!name || !description || !address || !amenities || !star_rating || !pictures || !province || !rooms){
-      return res.status(400).json({ message: "All fields are required" });  
-    };
-    try{
-    const accomodation = await accomodationServices.createAccomdation(req.body)
-    return res.status(201).json({
-        message: "Accomodation created successfully",
-        accomodationId: accomodation.id
-    })
-    }catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "Error Creating a User" });
-    };
+export const createAccomodationController = async (req: Request, res: Response) => {
+    try {
+        // 1. Extract files from Multer array allocation layer
+        const uploadFiles = req.files as Express.Multer.File[] | undefined;
+        
+        // Convert the file array into a serializable string array of file storage locations
+        const filePaths: string[] = uploadFiles ? uploadFiles.map(file => `/uploads/${file.filename}`) : [];
+
+        // 2. Extract plain text parameter inputs from body wrapper
+        const { name, description, address, amenities, star_rating, province, rooms } = req.body;
+
+        // 3. Handle parsing of incoming JSON array strings from form data safely
+        const parsedAmenities = typeof amenities === 'string' ? JSON.parse(amenities) : amenities;
+        const parsedRooms = typeof rooms === 'string' ? JSON.parse(rooms) : rooms;
+
+        // 4. Custom validation checks verifying all fields exist cleanly 
+        // (Checking filePaths instead of req.body.pictures)
+        if (!name || !description || !address || !parsedAmenities || parsedAmenities.length === 0 || 
+            !star_rating || filePaths.length === 0 || !province || !parsedRooms || parsedRooms.length === 0) {
+            return res.status(400).json({ message: "All fields are required, including at least one picture." });
+        }
+
+        // 5. Structure a uniform payload item to forward to your Service layer
+        const newAccomodationPayload = {
+            name,
+            description,
+            address,
+            star_rating: Number(star_rating), // Force cast numeric constraints cleanly
+            province,
+            amenities: parsedAmenities,
+            rooms: parsedRooms,
+            pictures: filePaths // Forwarding our clean array of image string references
+        };
+
+        // 6. Execute database persistence call
+        const accomodation = await accomodationServices.createAccomdation(newAccomodationPayload);
+        
+        return res.status(201).json({
+            message: "Accomodation created successfully",
+            accomodationId: accomodation.id,
+            accomodation: accomodation // Useful for Redux slice array injection payloads
+        });
+
+    } catch (error) {
+        console.error("Backend controller error trace:", error);
+        return res.status(500).json({ message: "Error Creating an Accommodation Profile" });
+    }
 };
+
 
 export const getAllAccomodationsController = async (req: Request, res: Response) => {
     try {
