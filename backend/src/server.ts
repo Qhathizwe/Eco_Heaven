@@ -6,6 +6,7 @@ import { DBConnection } from "./config/database";
 
 import { createUserTable } from "./services/userServices";
 import { createAccomodationTable } from "./services/accomodationServices";
+import { createRoomsTable } from "./services/roomServices";
 
 import userRouter from "./routes/userRoutes";
 import accomodationRouter from "./routes/accomodationsRoutes"
@@ -25,7 +26,10 @@ const startServer = async () => {
 
     const createTables = async () =>{
         await createUserTable()
+
         await createAccomodationTable()
+
+        await createRoomsTable()
     }
 
     await createTables()
