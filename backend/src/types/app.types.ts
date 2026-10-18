@@ -29,3 +29,13 @@ export interface Accomodations {
 };
 export type new_accomodation = Omit<Accomodations, 'id' >;
 
+ //===================== Rooms ===================//
+ export interface Rooms {
+    id: number,
+    accomodation_id: number;
+    room_type: string;
+    price_per_night: number;
+    description: string;
+    pictures: string[];
+    is_available: boolean
+ };
