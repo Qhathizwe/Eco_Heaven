@@ -39,3 +39,19 @@ export type new_accomodation = Omit<Accomodations, 'id' >;
     pictures: string[];
     is_available: boolean
  };
+
+//===================== bookings ===================//
+export type booking_status = "pending" | "confirmed" | "cancelled" | "completed"; 
+
+export interface Booking { 
+  id: number;
+  user_id: number;       
+  accommodation_id: number; 
+  room_id: number;        
+  check_in: Date;
+  check_out: Date;
+  created_at?: Date;
+  status: booking_status;
+};
+
+export type new_booking = Omit<Booking, 'id' >;
