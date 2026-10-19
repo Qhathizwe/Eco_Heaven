@@ -15,7 +15,7 @@ interface ModalProps {
 export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
     const { form, isLoading, error } = useAppSelector((state) => state.accomodation);
-
+    
     // FIX 1: Local state for files keeps Redux fully serializable 
     // and eliminates all toolkit console warnings
     const [localPictures, setLocalPictures] = useState<File[]>([]);
@@ -45,14 +45,14 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
         formData.append('address', form.address);
         formData.append('star_rating', form.star_rating.toString());
         formData.append('province', form.province);
-
+        
         // Handle parsing comma-separated field text inputs safely into string arrays
-        const amenitiesArray = typeof form.amenities === 'string'
-            ? (form.amenities as string).split(',').map(item => item.trim())
+        const amenitiesArray = typeof form.amenities === 'string' 
+            ? (form.amenities as string).split(',').map(item => item.trim()) 
             : form.amenities;
 
-        const roomsArray = typeof form.rooms === 'string'
-            ? (form.rooms as string).split(',').map(item => item.trim())
+        const roomsArray = typeof form.rooms === 'string' 
+            ? (form.rooms as string).split(',').map(item => item.trim()) 
             : form.rooms;
 
         formData.append('amenities', JSON.stringify(amenitiesArray));
@@ -64,7 +64,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
         if (localPictures.length > 0) {
             localPictures.forEach((file: File) => {
                 // Change 'pictures' to the exact singular field property key name your backend expects (e.g., 'picture' or 'image')
-                formData.append('pictures', file);
+                formData.append('pictures', file); 
             });
         }
 
@@ -159,7 +159,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                         <input
                             type="text"
                             name="amenities"
-                            value={Array.isArray(form.amenities) ? form.amenities.join(', ') : form.amenities}
+                            value={Array.isArray(form.amenities) ? form.amenities.join(', ') : form.amenities}  
                             onChange={handleInputChange}
                             placeholder="wifi, pool, spa, gym"
                         />
@@ -189,18 +189,15 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                                 }
                             }}
                         />
-                    </div>
 
-                    {/* Image Gallery Preview Grid */}
-                    {localPictures.length > 0 && (
-                        <div className={styles.previewContainer}>
-                            <label>Selected Previews ({localPictures.length})</label>
+                        {/* Image Gallery Preview Grid UI rendering */}
+                        {localPictures.length > 0 && (
                             <div className={styles.previewGrid}>
                                 {localPictures.map((file, index) => (
                                     <div key={index} className={styles.previewItem}>
-                                        <img
-                                            src={URL.createObjectURL(file)}
-                                            alt={`preview ${index}`}
+                                        <img 
+                                            src={URL.createObjectURL(file)} 
+                                            alt={`preview ${index}`} 
                                             className={styles.previewImage}
                                         />
                                         <button
@@ -213,10 +210,9 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                                     </div>
                                 ))}
                             </div>
-                        </div>
-                    )}
-
-
+                        )}
+                    </div>
+                    
                     <button type="submit" disabled={isLoading} className={styles.submitBtn}>
                         {isLoading ? 'Saving...' : 'Add Accommodation'}
                     </button>
