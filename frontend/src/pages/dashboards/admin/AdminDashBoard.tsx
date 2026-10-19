@@ -105,13 +105,6 @@ const AdminDashboard = () => {
               <h2>Management centre</h2>
             </div>
 
-            {/* 💡 4. Connect the button onClick to flip your visibility state to TRUE */}
-            <button 
-              className={styles.addAccommodationBtn}
-              onClick={() => setIsModalOpen(true)}
-            >
-              + Add Accommodation
-            </button>
           </div>
 
           <div className={styles.managementGrid}>
