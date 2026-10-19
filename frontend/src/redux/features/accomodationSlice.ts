@@ -9,9 +9,7 @@ interface AccomodationState {
         address: string;
         amenities: string[];
         star_rating: number;
-        // FIX 1: Type shifted to string[] to hold image URLs/filenames 
-        // returned by the backend database rather than raw File objects.
-        pictures: string[]; 
+        pictures?: string[];
         province: string;
         rooms?: string[];
     };
@@ -44,16 +42,13 @@ const API_URL = "http://localhost:7000/api";
 // CREATE Accommodation
 export const addAccomodationThunk = createAsyncThunk(
     'accomodation/addAccomodation',
-    async (accomodationData: FormData, thunkAPI) => { // Force parameter strictly to FormData
+    async (accomodationData: FormData, thunkAPI) => {
         try {
-            // FIX 2: Do NOT provide a 'Content-Type' header when uploading a FormData object.
-            // Leaving it empty allows the browser to automatically compute the boundary 
-            // delimiter string required for 'multipart/form-data'. Do NOT call JSON.stringify().
             const response = await fetch(API_URL + '/accomodation', {
                 method: 'POST',
                 body: accomodationData,
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Failed to create accommodation profile');
@@ -83,16 +78,21 @@ export const getAccomodationsThunk = createAsyncThunk(
 );
 
 // UPDATE Accommodation
+// FIX: Modified signature to expect an object structure splitting the ID configuration away from FormData
 export const updateAccomodationThunk = createAsyncThunk(
     'accomodation/updateAccomodation',
-    async (accomodationData: Accomodations, thunkAPI) => {
+    async ({ id, formData }: { id: number | string; formData: FormData }, thunkAPI) => {
         try {
-            const response = await fetch(`${API_URL}/${accomodationData.id}`, {
+            // FIX: Removed 'Content-Type' JSON headers to let the browser automatically handle multipart/form-data boundaries
+            const response = await fetch(`${API_URL}/accomodations/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(accomodationData),
+                body: formData,
             });
-            if (!response.ok) throw new Error('Failed to update accommodation record');
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to update accommodation record');
+            }
             return await response.json();
         } catch (error: any) {
             return thunkAPI.rejectWithValue(error.message);
@@ -127,8 +127,7 @@ const accomodationSlice = createSlice({
             const { field, value } = action.payload;
             if (field === 'star_rating') {
                 state.form.star_rating = Number(value) || 1.0;
-            } else if (field === 'amenities' || field === 'rooms') { 
-                // Removed 'pictures' handling from string split logic block
+            } else if (field === 'amenities' || field === 'rooms') {
                 state.form[field] = typeof value === 'string' ? value.split(',').map(i => i.trim()) : value;
             } else {
                 state.form[field] = value;
@@ -162,13 +161,13 @@ const accomodationSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Handle loading status flags cleanly
             .addCase(addAccomodationThunk.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(addAccomodationThunk.fulfilled, (state, action: PayloadAction<Accomodations>) => {
-                state.accomodationList.push(action.payload);
+            .addCase(addAccomodationThunk.fulfilled, (state, action: PayloadAction<any>) => {
+                const cleanItem = action.payload.accomodation || action.payload;
+                state.accomodationList.push(cleanItem);
                 state.isSuccess = true;
                 state.isLoading = false;
             })
@@ -179,13 +178,29 @@ const accomodationSlice = createSlice({
             .addCase(getAccomodationsThunk.fulfilled, (state, action: PayloadAction<Accomodations[]>) => {
                 state.accomodationList = action.payload;
             })
-            .addCase(updateAccomodationThunk.fulfilled, (state, action: PayloadAction<Accomodations>) => {
-                const index = state.accomodationList.findIndex(item => item.id === action.payload.id);
-                if (index !== -1) state.accomodationList[index] = action.payload;
-                state.isSuccess = true;
-            })
             .addCase(deleteAccomodationThunk.fulfilled, (state, action: PayloadAction<number>) => {
                 state.accomodationList = state.accomodationList.filter(item => item.id !== action.payload);
+            })
+            .addCase(updateAccomodationThunk.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateAccomodationThunk.fulfilled, (state, action: PayloadAction<any>) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+
+                const updatedItem = action.payload.accomodation || action.payload;
+                const index = state.accomodationList.findIndex(item => item.id === updatedItem.id);
+
+                if (index !== -1) {
+                    state.accomodationList[index] = updatedItem;
+                } else {
+                    state.accomodationList.push(updatedItem);
+                }
+            })
+            .addCase(updateAccomodationThunk.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
             });
     }
 });
