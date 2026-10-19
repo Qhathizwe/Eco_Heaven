@@ -18,7 +18,7 @@ export const createAccomodationTable = async (): Promise<void> => {
  )`
     )
     try {
-        console.log("Accomodation table created successfully!")
+        console.log("Accomodation table checked/created successfully!")
     } catch (error) {
         console.log('failed to Accomodation create table')
     }
