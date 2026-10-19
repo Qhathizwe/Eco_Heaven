@@ -27,7 +27,7 @@ export const createUserTable = async (): Promise<void> => {
         )`);
     try {
         console.log("Creating tables")
-        console.log("Users table created successfully!")
+        console.log("Users table checked/created successfully!")
     } catch (error) {
         console.log('failed to Users create table')
     }
