@@ -115,15 +115,15 @@ const LandingPage = () => {
           ) : (
             <div className={styles.stayGrid}>
               {/* 4. Limit preview listings window to the top 3 newest dynamic items */}
-              {accomodationList.slice(0, 3).map((stay) => {
+              {accomodationList.slice(0, 6).map((stay) => {
 
-                // Set up your base server media URL
-                const SERVER_URL = "http://localhost:7000/";
+               
 
-                // Check if pictures array exists and has entries, then append the server domain address
-                const cardThumbnail = stay.pictures && stay.pictures.length > 0
-                  ? `${SERVER_URL}${stay.pictures[0]}`
-                  : hero;
+                // Check if pictures array exists and has entries
+              const cardThumbnail = stay.pictures && stay.pictures.length > 0
+                ? stay.pictures[0] // Use the Cloudinary URL directly!
+                : hero;
+
 
                 return (
                   <article className={styles.stayCard} key={stay.id}>

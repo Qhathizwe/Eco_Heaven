@@ -46,8 +46,8 @@ const ManageAccommodations = () => {
                         <h1>Manage Accommodations</h1>
                         <p>View, modify, or add new properties to your listing.</p>
                     </div>
-                    <button 
-                        className={styles.addAccommodationBtn} 
+                    <button
+                        className={styles.addAccommodationBtn}
                         onClick={() => {
                             dispatch(setEditingAccomodation(null)); // Ensures form clears when creating a fresh listing
                             setIsModalOpen(true);
@@ -87,10 +87,11 @@ const ManageAccommodations = () => {
                                         <td style={{ padding: "12px" }}>
                                             {item.pictures && item.pictures.length > 0 ? (
                                                 <img
-                                                    src={`http://localhost:7000/uploads/${item.pictures[0]}`}
+                                                    src={item.pictures && item.pictures.length > 0 ? item.pictures[0] : 'placeholder-image-url.jpg'}
                                                     alt={item.name}
                                                     style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "4px" }}
                                                 />
+
                                             ) : (
                                                 <div style={{ width: "50px", height: "50px", backgroundColor: "#eee", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", color: "#888", borderRadius: "4px" }}>No Image</div>
                                             )}
@@ -129,7 +130,7 @@ const ManageAccommodations = () => {
                                         </td>
                                     </tr>
                                 ))}
-							</tbody>
+                            </tbody>
                         </table>
                     )}
                 </section>

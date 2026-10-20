@@ -142,10 +142,11 @@ const ManageRooms = () => {
                     <td style={{ padding: "12px" }}>
                       {room.pictures && room.pictures.length > 0 ? (
                         <img
-                          src={`http://localhost:7000/uploads/${room.pictures[0]}`}
+                          src={room.pictures && room.pictures.length > 0 ? room.pictures[0].replace("http://", "https://") : 'placeholder-image-url.jpg'}
                           alt={room.room_type}
                           style={{ width: "52px", height: "52px", objectFit: "cover", borderRadius: "5px", border: "1px solid #dce2d8" }}
                         />
+
                       ) : (
                         <div style={{ width: "52px", height: "52px", backgroundColor: "#eaf0e8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: "#666", borderRadius: "5px", fontWeight: 600 }}>
                           No Photo
