@@ -1,7 +1,7 @@
 import { useState } from "react"; // 💡 1. MUST IMPORT useState
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashBoard.module.css";
-import { AddAccommodationModal } from "../../../components/add accomodation modal/AddAccommodationModal"; // 💡 
+import { AddAccommodationModal } from "../../../components/modals/add accomodation modal/AddAccommodationModal"; // 💡 
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
       icon: "▣",
     },
     {
-      title: "Customers",
+      title: "Users",
       description: "View customer accounts and details.",
       action: "View customers",
       route: "/admin/users",

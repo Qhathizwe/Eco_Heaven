@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./../AdminDashBoard.module.css";
-import { AddRoomModal } from "../../../../components/add room modal/addRoomModal";
+import { AddRoomModal } from "../../../../components/modals/add room modal/addRoomModal";
 import {
   getRoomsByAccommodationThunk,
   deleteRoomThunk,
