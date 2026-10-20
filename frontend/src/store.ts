@@ -5,13 +5,15 @@ import  registerSlice  from "./redux/features/registerSlice";
 import loginSlice from './redux/features/loginSlice'
 import accomodationSlice from './redux/features/accomodationSlice'
 import roomSlice from './redux/features/roomSlice'
+import userSlice from './redux/features/userSlices'
 
 export const store = configureStore({
     reducer: {
         login: loginSlice,
         register: registerSlice,
         accomodation: accomodationSlice,
-        room: roomSlice
+        room: roomSlice,
+        user: userSlice
     }
 });
 export type RootState = ReturnType<typeof store.getState>;
