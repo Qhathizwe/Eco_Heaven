@@ -3,6 +3,7 @@ import Register from './pages/register/RegisterPage'
 import LoginPage from './pages/login/LoginPage'
 import AdminDashboard from './pages/dashboards/admin/AdminDashBoard'
 import UserDashboard from './pages/dashboards/user/UserDashboard'
+import AccommodationDetails from './pages/accomodation/AccomodationDetails'
 
 import ManageAccomodations from './pages/dashboards/admin/manage_admin/ManageAccomodations'
 import ManageRooms from './pages/dashboards/admin/manage_admin/ManageRooms'
@@ -23,6 +24,7 @@ function App() {
         <Route path='/' element={<LandingPage/>} />
         <Route path='/register' element={<Register />}/>
         <Route path='/login' element={<LoginPage/>} />
+        <Route path='/stays/:id' element={<AccommodationDetails/>} />
         
         <Route path='/admin-dashboard' element={<AdminDashboard/>} />
         <Route path='/admin/accommodations' element={<ManageAccomodations/>} />
