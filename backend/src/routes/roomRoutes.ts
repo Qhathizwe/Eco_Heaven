@@ -1,21 +1,24 @@
 import { Router } from "express";
-import { 
-    addRoomController, 
-    getAllRoomsController, 
-    getRoomsByAccommodationController, 
-    updateRoomController, 
-    deleteRoomController 
-} from "../controllers/roomControllers"; // adjust path as needed
+import {
+  addRoomController,
+  getAllRoomsController,
+  getRoomsByAccommodationController,
+  updateRoomController,
+  deleteRoomController,
+} from "../controllers/roomControllers";
+import { protect, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Route must match frontend: ${API_URL}/accommodations/${accommodationId}/rooms
-router.get("/accommodations/:accommodationId/rooms", getRoomsByAccommodationController);
-
-router.post("/room", addRoomController);
 router.get("/rooms", getAllRoomsController);
-router.get('/accommodations/:accommodationId/rooms', getRoomsByAccommodationController);
-router.put("/rooms/:id", updateRoomController);
-router.delete("/rooms/:id", deleteRoomController);
+
+router.get(
+  "/accommodations/:accommodationId/rooms",
+  getRoomsByAccommodationController,
+);
+
+router.post("/rooms", protect, requireAdmin, addRoomController);
+router.put("/rooms/:id", protect, requireAdmin, updateRoomController);
+router.delete("/rooms/:id", protect, requireAdmin, deleteRoomController);
 
 export default router;
