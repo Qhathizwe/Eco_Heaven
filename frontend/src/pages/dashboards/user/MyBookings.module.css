@@ -1,0 +1,248 @@
+.page {
+  width: min(1120px, calc(100% - 36px));
+  min-height: 70vh;
+  margin: 48px auto 80px;
+  color: #24382c;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #98794a;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.page > h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 600;
+}
+
+.intro {
+  max-width: 620px;
+  margin: 12px 0 32px;
+  color: #6e776e;
+  line-height: 1.7;
+}
+
+.message {
+  padding: 20px 0;
+  color: #667268;
+}
+
+.notice,
+.empty {
+  padding: clamp(24px, 5vw, 46px);
+  background: #f7f5ee;
+  border: 1px solid #e6e4d9;
+  border-radius: 20px;
+}
+
+.notice h2,
+.empty h2 {
+  margin-top: 0;
+  color: #244d3a;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.notice p,
+.empty p {
+  color: #69756b;
+  line-height: 1.7;
+}
+
+.notice a {
+  color: #244d3a;
+  font-weight: 700;
+}
+
+.empty {
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 20px;
+  place-items: center;
+  color: #fff;
+  background: #244d3a;
+  border-radius: 50%;
+  font-size: 2rem;
+}
+
+.primaryButton {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 12px 20px;
+  color: #fff;
+  background: #244d3a;
+  border-radius: 9px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.list {
+  display: grid;
+  gap: 22px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5e6df;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgb(34 51 38 / 5%);
+}
+
+.image,
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  min-height: 290px;
+  object-fit: cover;
+}
+
+.imagePlaceholder {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #244d3a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+}
+
+.cardBody {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.reference {
+  color: #98794a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.cardTop h2 {
+  margin: 7px 0 0;
+  color: #244d3a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+}
+
+.status {
+  padding: 7px 11px;
+  color: #805d18;
+  background: #fbf1d8;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.confirmed,
+.completed {
+  color: #226341;
+  background: #e3f4e8;
+}
+
+.cancelled {
+  color: #982d2d;
+  background: #ffebeb;
+}
+
+.address {
+  margin: 10px 0 24px;
+  color: #788076;
+  font-size: 0.9rem;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  padding: 20px 0;
+  border-top: 1px solid #eceee8;
+  border-bottom: 1px solid #eceee8;
+}
+
+.details div {
+  display: grid;
+  gap: 7px;
+}
+
+.details span {
+  color: #898f85;
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.details strong {
+  color: #304636;
+  font-size: 0.91rem;
+}
+
+.price {
+  margin: 20px 0 4px;
+  color: #244d3a;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.price span {
+  color: #7b8379;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.disclaimer {
+  margin-bottom: 0;
+  color: #8a9088;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 700px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .image,
+  .imagePlaceholder {
+    height: 220px;
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 420px) {
+  .page {
+    width: calc(100% - 24px);
+    margin-top: 28px;
+  }
+
+  .cardTop {
+    flex-direction: column;
+  }
+
+  .details {
+    gap: 14px;
+  }
+}
