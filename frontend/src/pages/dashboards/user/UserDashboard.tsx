@@ -1,179 +1,174 @@
-
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./UserDashboard.module.css";
+import { useAppDispatch, useAppSelector } from "../../../hooks/hooks";
+import { getAccomodationsThunk } from "../../../redux/features/accomodationSlice";
 
-const UserDashboard = () => {
+
+import styles from "../../landingPage/LandingPage.module.css";
+import Navbar from "../../../components/navbar/Navbar";
+
+import hero from "../../../assets/hero-image.jpg";
+import search from "../../../assets/search.png";
+
+const LandingPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  
-  const upcomingBookings = [
-    {
-      id: "WH-1001",
-      stay: "Luxury Forest Lodge",
-      dates: "Dates to be confirmed",
-      status: "Pending",
-    },
-  ];
+  // 1. Pull dynamic database items directly from your custom slice state
+  const { accomodationList, isLoading } = useAppSelector((state) => state.accomodation);
+
+  // 2. Fetch live database data on component initialization mount
+  useEffect(() => {
+    dispatch(getAccomodationsThunk());
+  }, [dispatch]);
 
   return (
-    <div className={styles.dashboard}>
-      <aside className={styles.sidebar}>
-        <div className={styles.brand}>WildHaven</div>
-        <p className={styles.sidebarLabel}>YOUR SPACE</p>
+    <div className={styles.page}>
 
-        <nav className={styles.navigation}>
-          <a href="#overview" className={styles.activeLink}>
-            <span>⌂</span> Overview
-          </a>
-          <a href="#bookings">
-            <span>▣</span> My bookings
-          </a>
-          <a href="#favourites">
-            <span>♡</span> Favourites
-          </a>
-          <a href="#profile">
-            <span>◉</span> My profile
-          </a>
-        </nav>
+      {/* user nav bar to be made*/}
+      <Navbar />
 
-        <button
-          className={styles.sidebarButton}
-          onClick={() => navigate("/")}
-        >
-          ← Back to website
-        </button>
-      </aside>
+      <main>
+        <section className={styles.hero}>
+          <img
+            src={hero}
+            alt="Beautiful lodge surrounded by nature"
+            className={styles.heroImage}
+          />
 
-      <main className={styles.main} id="overview">
-        <header className={styles.topbar}>
-          <div>
-            <span className={styles.muted}>YOUR PERSONAL RETREAT</span>
-            <h1>Welcome back!</h1>
-          </div>
+          <div className={styles.heroOverlay} />
 
-          <button
-            className={styles.profileButton}
-            onClick={() => navigate("/login")}
-          >
-            <span className={styles.avatar}>G</span>
-            <span>My account</span>
-          </button>
-        </header>
-
-        <section className={styles.welcomeCard}>
-          <div>
-            <span className={styles.welcomeEyebrow}>
-              YOUR NEXT ADVENTURE
+          <div className={styles.heroContent}>
+            <span className={styles.eyebrow}>
+              YOUR NEXT ESCAPE STARTS HERE
             </span>
-            <h2>Your next escape is waiting.</h2>
+
+            <h1>
+              Find your peace.
+              <br />
+              <span>Discover your stay.</span>
+            </h1>
+
             <p>
-              Find a peaceful lodge, plan a getaway, and
-              keep all your reservations in one place.
+              Escape the ordinary and discover beautiful places
+              to rest, reconnect, and experience nature.
             </p>
 
             <button
-              className={styles.primaryButton}
-              onClick={() => navigate("/stays")}
+              className={styles.findStaysBtn}
+              onClick={() =>
+                document
+                  .getElementById("stays")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
             >
-              Explore stays →
+              <img src={search} alt="" />
+              Find a stay
             </button>
+
+            <div className={styles.heroNote}>
+              <span>✦ Carefully selected stays</span>
+              <span>✦ Memorable experiences</span>
+            </div>
+          </div>
+
+          <div className={styles.heroBadge}>
+            <span>YOUR ESCAPE</span>
+            <strong>Begins here.</strong>
           </div>
         </section>
 
-        <section className={styles.statsGrid}>
-          <article className={styles.statCard}>
-            <span>My bookings</span>
-            <strong>{upcomingBookings.length}</strong>
-            <small>Bookings shown in this demo</small>
-          </article>
-
-          <article className={styles.statCard}>
-            <span>Upcoming stays</span>
-            <strong>—</strong>
-            <small>Connect your booking data</small>
-          </article>
-
-          <article className={styles.statCard}>
-            <span>Saved favourites</span>
-            <strong>—</strong>
-            <small>Connect your favourites data</small>
-          </article>
+        <section className={styles.intro} id="philosophy">
+          <span className={styles.sectionLabel}>OUR PHILOSOPHY</span>
+          <h2>More than a stay. A feeling.</h2>
+          <p>
+            We believe the best escapes bring you closer to
+            nature, comfort, and the moments that matter.
+            Discover places where you can slow down and feel
+            at home away from home.
+          </p>
         </section>
 
-        <section className={styles.panel} id="bookings">
-          <div className={styles.panelHeading}>
+        <section className={styles.staysSection} id="stays">
+          <div className={styles.sectionHeading}>
             <div>
-              <span className={styles.muted}>KEEP EVERYTHING IN ONE PLACE</span>
-              <h2>My bookings</h2>
+              <span className={styles.sectionLabel}>
+                EXPLORE OUR COLLECTION
+              </span>
+              <h2>Find your perfect escape</h2>
             </div>
 
             <button
-              className={styles.textButton}
+              className={styles.outlineButton}
               onClick={() => navigate("/stays")}
             >
-              Find another stay →
+              Explore all stays →
             </button>
           </div>
 
-          {upcomingBookings.length > 0 ? (
-            <div className={styles.bookingList}>
-              {upcomingBookings.map((booking) => (
-                <article className={styles.bookingRow} key={booking.id}>
-                  <div className={styles.bookingIcon}>⌂</div>
-
-                  <div className={styles.bookingDetails}>
-                    <strong>{booking.stay}</strong>
-                    <span>{booking.dates}</span>
-                    <small>Reference: {booking.id}</small>
-                  </div>
-
-                  <span className={styles.status}>
-                    {booking.status}
-                  </span>
-                </article>
-              ))}
+          {/* 3. Handle asynchronous processing layout changes gracefully */}
+          {isLoading ? (
+            <div className={styles.loadingContainer}>
+              <p>Loading WildHaven escapes...</p>
+            </div>
+          ) : accomodationList.length === 0 ? (
+            <div className={styles.emptyContainer}>
+              <p>No accommodations available at the moment. Check back soon!</p>
             </div>
           ) : (
-            <div className={styles.emptyState}>
-              <span>⌂</span>
-              <h3>Your next escape starts here</h3>
-              <p>You haven't made any bookings yet.</p>
-              <button
-                className={styles.primaryButton}
-                onClick={() => navigate("/stays")}
-              >
-                Browse accommodation
-              </button>
+            <div className={styles.stayGrid}>
+              {/* 4. Limit preview listings window to the top 3 newest dynamic items */}
+              {accomodationList.slice(0, 6).map((stay) => {
+
+               
+
+                // Check if pictures array exists and has entries
+              const cardThumbnail = stay.pictures && stay.pictures.length > 0
+                ? stay.pictures[0] // Use the Cloudinary URL directly!
+                : hero;
+
+
+                return (
+                  <article className={styles.stayCard} key={stay.id}>
+                    <div className={styles.stayImageWrapper}>
+                      <img src={cardThumbnail} alt={stay.name} />
+                      <span className={styles.stayTag}>
+                        ★ {Number(stay.star_rating).toFixed(1)} Stars
+                      </span>
+                    </div>
+
+                    <div className={styles.stayInfo}>
+                      <span className={styles.stayLocation}>
+                        📍 {stay.province}
+                      </span>
+                      <h3>{stay.name}</h3>
+                      {/* String validation helper keeps description text matching schema requirements safely */}
+                      <p>{stay.description || "No description provided for this listing."}</p>
+
+                      <button
+                        className={styles.cardLink}
+                        onClick={() => navigate(`/stays/${stay.id}`)}
+                      >
+                        Discover this stay <span>→</span>
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
 
-        <section className={styles.quickLinks} id="favourites">
-          <article>
-            <span className={styles.quickIcon}>♡</span>
-            <div>
-              <h3>Your favourites</h3>
-              <p>Keep your favourite places together.</p>
-            </div>
-            <button onClick={() => navigate("/favourites")}>
-              View →
-            </button>
-          </article>
-
-          <article id="profile">
-            <span className={styles.quickIcon}>◉</span>
-            <div>
-              <h3>Your profile</h3>
-              <p>Manage your personal details and preferences.</p>
-            </div>
-            <button onClick={() => navigate("/profile")}>
-              Manage →
-            </button>
-          </article>
-        </section>
+     
       </main>
+
+      <footer className={styles.footer}>
+        <strong>WildHaven</strong>
+        <p>Find your peace. Discover your stay.</p>
+        <span>© {new Date().getFullYear()} WildHaven. All rights reserved.</span>
+      </footer>
     </div>
   );
 };
 
-export default UserDashboard;
+export default LandingPage;
