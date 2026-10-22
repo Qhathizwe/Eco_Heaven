@@ -1,26 +1,49 @@
 import { Router } from "express";
-import { upload } from '../middleware/uploadMiddleware';
 import {
-    createAccomodationController,
-    getAllAccomodationsController,
-    getAccomodationByIdController,
-    getAccomodationByNameController,
-    getAccomodationByProvinceController,
-    updateAccomodationController,
-    deleteAccomodationController
-} from '../controllers/accomodationControllers';
+  createAccomodationController,
+  getAllAccomodationsController,
+  getAccomodationByIdController,
+  getAccomodationByNameController,
+  getAccomodationByProvinceController,
+  updateAccomodationController,
+  deleteAccomodationController,
+} from "../controllers/accomodationControllers";
+import { upload } from "../middleware/uploadMiddleware";
+import { protect, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Routes handling image arrays matching your React FormData keys
-router.post('/accomodation', upload.array('pictures', 10), createAccomodationController);
-router.put('/accomodations/:id', upload.array('pictures', 10), updateAccomodationController);
+// Public accommodation browsing
+router.get("/accommodations", getAllAccomodationsController);
+router.get("/accommodations/search", getAccomodationByNameController);
+router.get(
+  "/accommodations/province/:province",
+  getAccomodationByProvinceController,
+);
+router.get("/accommodations/:id", getAccomodationByIdController);
 
-// Standard data pipeline routes
-router.get('/accomodations', getAllAccomodationsController);
-router.get('/accomodations/:id', getAccomodationByIdController);
-router.get('/accomodations/name/:name', getAccomodationByNameController);
-router.get('/accomodations/province/:province', getAccomodationByProvinceController);
-router.delete('/accomodations/:id', deleteAccomodationController);
+// Admin-only accommodation management
+router.post(
+  "/accommodations",
+  protect,
+  requireAdmin,
+  upload.array("pictures", 10),
+  createAccomodationController,
+);
+
+router.put(
+  "/accommodations/:id",
+  protect,
+  requireAdmin,
+  upload.array("pictures", 10),
+  updateAccomodationController,
+);
+
+router.delete(
+  "/accommodations/:id",
+  protect,
+  requireAdmin,
+  deleteAccomodationController,
+);
 
 export default router;

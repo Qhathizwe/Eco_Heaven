@@ -1,122 +1,124 @@
-import { query } from '../config/database';
-import { Rooms } from '../types/app.types';
+import { query } from "../config/database";
+import type { Rooms } from "../types/app.types";
 
-// CREATE Room Table
-export const createRoomsTable = async (): Promise<void> => {
-    await query(`
-        CREATE TABLE IF NOT EXISTS rooms (
-            id SERIAL PRIMARY KEY,
-            accommodation_id INT NOT NULL REFERENCES accommodations(id) ON DELETE CASCADE,
-            room_type VARCHAR(100) NOT NULL,
-            price_per_night DECIMAL(10, 2) NOT NULL,
-            description TEXT NOT NULL,
-            is_available BOOLEAN NOT NULL DEFAULT TRUE,
-            pictures TEXT[]
-        )`
+export async function createRoomsTable(): Promise<void> {
+  await query(`
+    CREATE TABLE IF NOT EXISTS rooms (
+      id SERIAL PRIMARY KEY,
+      accommodation_id INTEGER NOT NULL
+        REFERENCES accomodations(id) ON DELETE CASCADE,
+      room_type VARCHAR(100) NOT NULL,
+      price_per_night NUMERIC(10,2) NOT NULL CHECK (price_per_night >= 0),
+      description TEXT NOT NULL DEFAULT '',
+      is_available BOOLEAN NOT NULL DEFAULT TRUE,
+      pictures TEXT[] NOT NULL DEFAULT '{}'
     );
-    try {
-        console.log("Rooms table checked/created successfully!");
-    } catch (error) {
-        console.error("Failed to create Rooms table:", error);
-    }
-};
+  `);
 
-// ADD Room Service
-export const addRoomService = async (roomData: {
-    accommodation_id: number;
-    room_type: string;
-    price_per_night: number;
-    description: string;
-    is_available?: boolean;
-    pictures?: string[];
-}): Promise<Rooms> => {
-    const { accommodation_id, room_type, price_per_night, description, pictures, is_available } = roomData;
-    const cleanPictures = Array.isArray(pictures) ? pictures : [pictures].filter(Boolean);
-    
-    const values = [
-        accommodation_id, 
-        room_type, 
-        price_per_night, 
-        description, 
-        cleanPictures, 
-        is_available ?? true
-    ];
-    
-    const { rows } = await query(
-        `INSERT INTO rooms (accommodation_id, room_type, price_per_night, description, pictures, is_available) 
-         VALUES ($1, $2, $3, $4, $5, $6) 
-         RETURNING *`, 
-        values
-    );
-    return rows[0];
-};
+  console.log("Rooms table checked/created.");
+}
 
-// GET All Rooms (Global)
-export const getAllRooms = async (): Promise<Rooms[] | null> => {
-    try {
-        const { rows } = await query(`SELECT * FROM rooms ORDER BY id DESC`);
-        
-        if (!rows || rows.length === 0) {
-            return null;
-        }
-        
-        return rows as Rooms[];
-    } catch (error) {
-        console.error("Failed to fetch rooms from database:", error);
-        return null;
-    }
-};
+export interface RoomInput {
+  accommodation_id: number;
+  room_type: string;
+  price_per_night: number;
+  description: string;
+  is_available?: boolean;
+  pictures?: string[];
+}
 
-// GET Rooms Filtered by Accommodation ID
-export const getRoomsByAccommodationService = async (accommodationId: number | string): Promise<Rooms[]> => {
-    try {
-        const { rows } = await query(
-            `SELECT * FROM rooms WHERE accommodation_id = $1 ORDER BY id DESC`, 
-            [accommodationId]
-        );
-        return rows as Rooms[];
-    } catch (error) {
-        console.error("Failed to fetch rooms by accommodation:", error);
-        throw new Error("Database query failed");
-    }
-};
+export async function addRoomService(data: RoomInput): Promise<Rooms> {
+  const result = await query<Rooms>(
+    `
+      INSERT INTO rooms
+        (accommodation_id, room_type, price_per_night,
+         description, is_available, pictures)
+      VALUES ($1,$2,$3,$4,$5,$6)
+      RETURNING *
+    `,
+    [
+      data.accommodation_id,
+      data.room_type.trim(),
+      data.price_per_night,
+      data.description ?? "",
+      data.is_available ?? true,
+      data.pictures ?? [],
+    ],
+  );
 
-// UPDATE Room Service
-export const updateRoomService = async (id: number, updateData: any): Promise<Rooms | null> => {
-    try {
-        // Build dynamic update query based on fields provided
-        const { room_type, price_per_night, description, is_available, pictures } = updateData;
-        
-        const { rows } = await query(
-            `UPDATE rooms 
-             SET room_type = COALESCE($1, room_type),
-                 price_per_night = COALESCE($2, price_per_night),
-                 description = COALESCE($3, description),
-                 is_available = COALESCE($4, is_available),
-                 pictures = COALESCE($5, pictures)
-             WHERE id = $6 
-             RETURNING *`,
-            [room_type, price_per_night, description, is_available, pictures, id]
-        );
+  return result.rows[0];
+}
 
-        if (!rows || rows.length === 0) {
-            return null;
-        }
+export async function getAllRooms(): Promise<Rooms[]> {
+  const result = await query<Rooms>(
+    "SELECT * FROM rooms ORDER BY id DESC",
+  );
 
-        return rows[0] as Rooms;
-    } catch (error) {
-        console.error("Failed to update room:", error);
-        throw new Error("Database update failed");
-    }
-};
+  return result.rows;
+}
 
-// DELETE Room Service
-export const deleteRoomService = async (id: number): Promise<boolean> => {
-    try {
-        const { rowCount } = await query(`DELETE FROM rooms WHERE id = $1`, [id]);
-        return (rowCount ?? 0) > 0;
-    } catch (error) {
-        console.error("Failed to delete room:", error);
-        throw new Error("Database deletion failed");
-    }
-};
+export async function getRoomsByAccommodationService(
+  accommodationId: number,
+): Promise<Rooms[]> {
+  const result = await query<Rooms>(
+    `
+      SELECT * FROM rooms
+      WHERE accommodation_id = $1
+      ORDER BY id DESC
+    `,
+    [accommodationId],
+  );
+
+  return result.rows;
+}
+
+export async function getRoomById(id: number): Promise<Rooms | null> {
+  const result = await query<Rooms>(
+    "SELECT * FROM rooms WHERE id = $1",
+    [id],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function updateRoomService(
+  id: number,
+  data: Partial<RoomInput>,
+): Promise<Rooms | null> {
+  const existing = await getRoomById(id);
+  if (!existing) return null;
+
+  const result = await query<Rooms>(
+    `
+      UPDATE rooms
+      SET accommodation_id = $1,
+          room_type = $2,
+          price_per_night = $3,
+          description = $4,
+          is_available = $5,
+          pictures = $6
+      WHERE id = $7
+      RETURNING *
+    `,
+    [
+      data.accommodation_id ?? existing.accommodation_id,
+      data.room_type?.trim() ?? existing.room_type,
+      data.price_per_night ?? existing.price_per_night,
+      data.description ?? existing.description,
+      data.is_available ?? existing.is_available,
+      data.pictures ?? existing.pictures ?? [],
+      id,
+    ],
+  );
+
+  return result.rows[0] ?? null;
+}
+
+export async function deleteRoomService(id: number): Promise<boolean> {
+  const result = await query(
+    "DELETE FROM rooms WHERE id = $1",
+    [id],
+  );
+
+  return (result.rowCount ?? 0) > 0;
+}

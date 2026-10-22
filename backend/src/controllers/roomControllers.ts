@@ -1,103 +1,139 @@
-import { Request, Response } from "express";
-import * as roomService from '../services/roomServices';
+import type { Request, Response } from "express";
+import * as roomService from "../services/roomServices";
 
-// CREATE Room
-export const addRoomController = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { accommodation_id, room_type, price_per_night, description, is_available } = req.body;
-        
-        // Extract filenames from uploaded files middleware if multer was used
-        const pictures = req.files ? (req.files as Express.Multer.File[]).map(file => file.filename) : req.body.pictures;
+export async function addRoomController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const accommodationId = Number(
+      req.body.accommodation_id ?? req.body.accomodation_id,
+    );
+    const price = Number(req.body.price_per_night);
+    const { room_type, description, is_available } = req.body;
 
-        if (!accommodation_id || !room_type || !price_per_night || !description) {
-            res.status(400).json({ 
-                success: false, 
-                message: "Missing required fields: accommodation_id, room_type, price_per_night, and description are required." 
-            });
-            return;
-        }
-
-        const newRoom = await roomService.addRoomService({
-            accommodation_id: Number(accommodation_id),
-            room_type, 
-            price_per_night: Number(price_per_night), 
-            description, 
-            pictures, 
-            is_available: is_available === 'true' || is_available === true
-        });
-
-        res.status(201).json({ success: true, data: newRoom });
-    } catch (error) {
-        console.error("Error in addRoomController:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+    if (
+      !Number.isInteger(accommodationId) ||
+      accommodationId < 1 ||
+      typeof room_type !== "string" ||
+      !room_type.trim() ||
+      !Number.isFinite(price) ||
+      price < 0
+    ) {
+      res.status(400).json({
+        message: "A valid accommodation, room type and nightly price are required.",
+      });
+      return;
     }
-};
 
-// READ ALL Rooms (Global)
-export const getAllRoomsController = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const rooms = await roomService.getAllRooms();
-        res.status(200).json({ success: true, data: rooms });
-    } catch (error) {
-        console.error("Error in getAllRoomsController:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+    const pictures = Array.isArray(req.body.pictures)
+      ? req.body.pictures
+      : [];
+
+    const room = await roomService.addRoomService({
+      accommodation_id: accommodationId,
+      room_type,
+      price_per_night: price,
+      description: typeof description === "string" ? description : "",
+      is_available:
+        typeof is_available === "boolean" ? is_available : true,
+      pictures,
+    });
+
+    res.status(201).json({
+      message: "Room created successfully.",
+      room,
+    });
+  } catch (error) {
+    console.error("Create room error:", error);
+    res.status(500).json({ message: "Unable to create room." });
+  }
+}
+
+export async function getAllRoomsController(
+  _req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    res.status(200).json(await roomService.getAllRooms());
+  } catch (error) {
+    console.error("Get rooms error:", error);
+    res.status(500).json({ message: "Unable to retrieve rooms." });
+  }
+}
+
+export async function getRoomsByAccommodationController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const accommodationId = Number(req.params.accommodationId);
+
+  if (!Number.isInteger(accommodationId) || accommodationId < 1) {
+    res.status(400).json({ message: "Invalid accommodation ID." });
+    return;
+  }
+
+  try {
+    res.status(200).json(
+      await roomService.getRoomsByAccommodationService(accommodationId),
+    );
+  } catch (error) {
+    console.error("Get accommodation rooms error:", error);
+    res.status(500).json({ message: "Unable to retrieve rooms." });
+  }
+}
+
+export async function updateRoomController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    res.status(400).json({ message: "Invalid room ID." });
+    return;
+  }
+
+  try {
+    const updated = await roomService.updateRoomService(id, req.body);
+
+    if (!updated) {
+      res.status(404).json({ message: "Room not found." });
+      return;
     }
-};
 
-// READ Rooms by Accommodation ID (Filtered)
-export const getRoomsByAccommodationController = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { accommodationId } = req.params;
-        const rooms = await roomService.getRoomsByAccommodationService(accommodationId as string);
-        
-        // Return raw array directly if your Redux thunk expects an array payload
-        res.status(200).json(rooms);
-    } catch (error) {
-        console.error("Error in getRoomsByAccommodationController:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(200).json({
+      message: "Room updated successfully.",
+      room: updated,
+    });
+  } catch (error) {
+    console.error("Update room error:", error);
+    res.status(500).json({ message: "Unable to update room." });
+  }
+}
+
+export async function deleteRoomController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    res.status(400).json({ message: "Invalid room ID." });
+    return;
+  }
+
+  try {
+    const deleted = await roomService.deleteRoomService(id);
+
+    if (!deleted) {
+      res.status(404).json({ message: "Room not found." });
+      return;
     }
-};
 
-// UPDATE Room
-export const updateRoomController = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const id = parseInt(req.params.id as string, 10);
-        if (isNaN(id)) {
-            res.status(400).json({ success: false, message: "Invalid room ID format." });
-            return;
-        }
-
-        const updatedRoom = await roomService.updateRoomService(id, req.body);
-        if (!updatedRoom) {
-            res.status(404).json({ success: false, message: "Room not found or no changes made." });
-            return;
-        }
-
-        res.status(200).json({ success: true, data: updatedRoom });
-    } catch (error) {
-        console.error("Error in updateRoomController:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
-
-// DELETE Room
-export const deleteRoomController = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const id = parseInt(req.params.id as string, 10);
-        if (isNaN(id)) {
-            res.status(400).json({ success: false, message: "Invalid room ID format." });
-            return;
-        }
-
-        const isDeleted = await roomService.deleteRoomService(id);
-        if (!isDeleted) {
-            res.status(404).json({ success: false, message: "Room not found." });
-            return;
-        }
-
-        res.status(200).json({ success: true, message: "Room successfully deleted." });
-    } catch (error) {
-        console.error("Error in deleteRoomController:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
-    }
-};
+    res.status(200).json({ message: "Room deleted successfully." });
+  } catch (error) {
+    console.error("Delete room error:", error);
+    res.status(500).json({ message: "Unable to delete room." });
+  }
+}

@@ -1,115 +1,161 @@
-import { query } from '../config/database'
-import { Accomodations, new_accomodation } from '../types/app.types'
-import bcrypt from 'bcryptjs'
+import { query } from "../config/database";
+import type {
+  Accomodations,
+  new_accomodation,
+} from "../types/app.types";
 
-export const createAccomodationTable = async (): Promise<void> => {
-    await query(
-        `CREATE TABLE IF NOT EXISTS accomodations(
-    id SERIAL PRIMARY KEY,                          
-    name VARCHAR(255) NOT NULL,               
-    description TEXT,                               
-    address TEXT NOT NULL,                          
-    amenities TEXT[] DEFAULT '{}',                
-    star_rating DECIMAL(2,1) NOT NULL,              
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(), 
-    pictures TEXT[] DEFAULT '{}',                 
-    province VARCHAR(100) NOT NULL, 
-    rooms TEXT[] DEFAULT '{}'  
- )`
-    )
+export async function createAccomodationTable(): Promise<void> {
+  await query(`
+    CREATE TABLE IF NOT EXISTS accomodations (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL,
+      amenities TEXT[] NOT NULL DEFAULT '{}',
+      star_rating NUMERIC(2,1) NOT NULL DEFAULT 0,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      pictures TEXT[] NOT NULL DEFAULT '{}',
+      province VARCHAR(100) NOT NULL,
+      rooms TEXT[] NOT NULL DEFAULT '{}'
+    );
+  `);
+
+  console.log("Accommodations table checked/created.");
+}
+
+function asStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+
+  if (typeof value === "string" && value.trim()) {
     try {
-        console.log("Accomodation table checked/created successfully!")
-    } catch (error) {
-        console.log('failed to Accomodation create table')
+      const parsed: unknown = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(
+          (item): item is string => typeof item === "string",
+        );
+      }
+    } catch {
+      return [value.trim()];
     }
-};
+  }
 
+  return [];
+}
 
+export async function createAccomdation(
+  data: new_accomodation,
+): Promise<Accomodations> {
+  const result = await query<Accomodations>(
+    `
+      INSERT INTO accomodations
+        (name, description, address, amenities, star_rating,
+         pictures, province, rooms)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *
+    `,
+    [
+      data.name.trim(),
+      data.description ?? "",
+      data.address.trim(),
+      asStringArray(data.amenities),
+      Number(data.star_rating),
+      asStringArray(data.pictures),
+      data.province.trim(),
+      asStringArray(data.rooms),
+    ],
+  );
 
-export const createAccomdation = async (accomodationData: any) => {
-    const { name, description, address, amenities, star_rating, pictures, province, rooms } = accomodationData;
+  return result.rows[0];
+}
 
-    // Ensure array fields are strictly arrays. If a single string slips in, wrap it inside brackets [].
-    const cleanAmenities = Array.isArray(amenities) ? amenities : [amenities].filter(Boolean);
-    const cleanPictures = Array.isArray(pictures) ? pictures : [pictures].filter(Boolean);
-    const cleanRooms = Array.isArray(rooms) ? rooms : [rooms].filter(Boolean);
+export async function findAllAccomodations(): Promise<Accomodations[]> {
+  const result = await query<Accomodations>(
+    "SELECT * FROM accomodations ORDER BY id DESC",
+  );
 
-    const values = [
-        name,
-        description || "",
-        address,
-        cleanAmenities, 
-        Number(star_rating),
-        cleanPictures,  
-        province,
-        cleanRooms
-    ];
+  return result.rows;
+}
 
-     const { rows } = await query (
-     `
-        INSERT INTO accomodations (name, description, address, amenities, star_rating, pictures, province, rooms)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        RETURNING *;
-    `,values 
-     )
+export async function findAccomodationById(
+  id: number,
+): Promise<Accomodations | null> {
+  const result = await query<Accomodations>(
+    "SELECT * FROM accomodations WHERE id = $1",
+    [id],
+  );
 
-    
+  return result.rows[0] ?? null;
+}
 
-    return rows[0];
-};
+export async function findAccomodationByName(
+  name: string,
+): Promise<Accomodations[]> {
+  const result = await query<Accomodations>(
+    "SELECT * FROM accomodations WHERE name ILIKE $1 ORDER BY id DESC",
+    [`%${name}%`],
+  );
 
+  return result.rows;
+}
 
-export const findAllAccomodations = async (): Promise<Accomodations[]> => {
-    const { rows } = await query(
-        "SELECT * FROM accomodations ORDER BY id ASC",
-    );
-    return rows
-};
+export async function findAccomodationByProvince(
+  province: string,
+): Promise<Accomodations[]> {
+  const result = await query<Accomodations>(
+    "SELECT * FROM accomodations WHERE province ILIKE $1 ORDER BY id DESC",
+    [province],
+  );
 
-export const findAccomodationById = async (id: number): Promise<Accomodations | null> => {
-    const { rows } = await query(
-        "SELECT * FROM accomodations WHERE id = $1", [id]
-    )
-    return rows[0] || null;
-};
+  return result.rows;
+}
 
-export const findAccomodationByName = async (name: string): Promise<Accomodations | null> => {
-    const { rows } = await query(
-        "SELECT * FROM accomodations WHERE name = $1", [name]
-    )
-    return rows[0] || null;
-};
+export async function updateAccomodation(
+  id: number,
+  data: Partial<new_accomodation>,
+): Promise<Accomodations | null> {
+  const existing = await findAccomodationById(id);
+  if (!existing) return null;
 
-export const findAccomodationByProvince = async (province: string): Promise<Accomodations[]> => {
-    const { rows } = await query(
-        "SELECT * FROM accomodations WHERE province = $1", [province]
-    )
-    return rows || [];
-};
+  const result = await query<Accomodations>(
+    `
+      UPDATE accomodations
+      SET name = $1,
+          description = $2,
+          address = $3,
+          amenities = $4,
+          star_rating = $5,
+          pictures = $6,
+          province = $7,
+          rooms = $8,
+          updated_at = NOW()
+      WHERE id = $9
+      RETURNING *
+    `,
+    [
+      data.name?.trim() ?? existing.name,
+      data.description ?? existing.description ?? "",
+      data.address?.trim() ?? existing.address,
+      asStringArray(data.amenities ?? existing.amenities),
+      Number(data.star_rating ?? existing.star_rating),
+      asStringArray(data.pictures ?? existing.pictures),
+      data.province?.trim() ?? existing.province,
+      asStringArray(data.rooms ?? existing.rooms),
+      id,
+    ],
+  );
 
-export const updateAccomodation = async (id: number, accomodationData: Partial<new_accomodation>): Promise<Accomodations | null> => {
-    const { name, description, address, amenities, star_rating, pictures, province, rooms } = accomodationData;
-    const { rows } = await query(`
-        UPDATE accomodations
-        SET name = COALESCE($1, name),
-            description = COALESCE($2, description),
-            address = COALESCE($3, address),
-            amenities = COALESCE($4, amenities),
-            star_rating = COALESCE($5, star_rating),
-            pictures = COALESCE($6, pictures),
-            province = COALESCE($7, province),
-            rooms = COALESCE($8, rooms)
-        WHERE id = $9
-        RETURNING *
-    `, [name, description, address, amenities, star_rating, pictures, province, rooms, id]);
-    return rows[0] || null;
-};
+  return result.rows[0] ?? null;
+}
 
+export async function deleteAccomodation(
+  id: number,
+): Promise<Accomodations | null> {
+  const result = await query<Accomodations>(
+    "DELETE FROM accomodations WHERE id = $1 RETURNING *",
+    [id],
+  );
 
-
-export const deleteAccomodation = async (id: number): Promise<Accomodations | null> => {
-    const { rows } = await query(
-        "DELETE FROM accomodations WHERE id = $1 RETURNING *", [id]
-    );
-    return rows[0] || null;
+  return result.rows[0] ?? null;
 }

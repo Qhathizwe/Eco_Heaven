@@ -44,7 +44,7 @@ export const addAccomodationThunk = createAsyncThunk(
     'accomodation/addAccomodation',
     async (accomodationData: FormData, thunkAPI) => {
         try {
-            const response = await fetch(API_URL + '/accomodation', {
+            const response = await fetch(API_URL + '/accommodations', {
                 method: 'POST',
                 body: accomodationData,
             });
@@ -65,7 +65,7 @@ export const getAccomodationsThunk = createAsyncThunk(
     'accomodation/getAccomodations',
     async (_, thunkAPI) => {
         try {
-            const response = await fetch(API_URL + '/accomodations', {
+            const response = await fetch(API_URL + '/accommodations', {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
