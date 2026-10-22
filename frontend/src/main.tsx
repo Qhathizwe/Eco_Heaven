@@ -1,20 +1,21 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
 
-import  {store }from './store.ts'
-import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
+import App from "./App";
+import { store } from "./store";
+import { restoreSession } from "./redux/features/loginSlice";
+import "./index.css";
 
-createRoot(document.getElementById('root')!).render(
+void store.dispatch(restoreSession());
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-    <BrowserRouter   future={{ 
-        v7_startTransition: true, 
-        v7_relativeSplatPath: true 
-      }}>
-    <App />
-    </BrowserRouter>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </Provider>
   </StrictMode>,
-)
+);
