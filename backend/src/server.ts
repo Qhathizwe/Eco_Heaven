@@ -1,48 +1,91 @@
+import "dotenv/config";
 import express from "express";
-import dotenv from 'dotenv';
+import cors from "cors";
+import path from "path";
 
-
-import { DBConnection } from "./config/database";
-
+import { DBConnection, pool } from "./config/database";
 import { createUserTable } from "./services/userServices";
 import { createAccomodationTable } from "./services/accomodationServices";
 import { createRoomsTable } from "./services/roomServices";
 import { createBookingTable } from "./services/bookingServices";
 
 import userRouter from "./routes/userRoutes";
-import accomodationRouter from "./routes/accomodationsRoutes"
-import roomRouter from './routes/roomRoutes'
-
-
-dotenv.config();
+import accomodationRouter from "./routes/accomodationsRoutes";
+import roomRouter from "./routes/roomRoutes";
+import bookingRouter from "./routes/bookingRoutes";
 
 const app = express();
-const cors = require('cors'); 
+const PORT = Number(process.env.PORT || 7000);
 
-const PORT = process.env.PORT || 7000;
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim());
 
-const startServer = async () => {
-    app.use(cors()); 
-    app.use(express.json());
-    await DBConnection()
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow requests without Origin for tools such as Thunder Client.
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origin is not allowed by CORS."));
+      }
+    },
+    credentials: true,
+  }),
+);
 
-    const createTables = async () =>{
-        await createUserTable()
-        await createAccomodationTable()
-        await createRoomsTable()
-        await createBookingTable()
-    }
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-    await createTables()
-    
-    app.use("/api", userRouter)
-    app.use("/api", accomodationRouter)
-    app.use("/api", roomRouter)
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "WildHaven API is running.",
+  });
+});
+
+app.use("/api", userRouter);
+app.use("/api", accomodationRouter);
+app.use("/api", roomRouter);
+app.use("/api", bookingRouter);
+
+app.use((_req, res) => {
+  res.status(404).json({ message: "API endpoint not found." });
+});
+
+app.use(
+  (
+    error: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction,
+  ) => {
+    console.error("Unhandled server error:", error);
+    res.status(500).json({ message: "An unexpected server error occurred." });
+  },
+);
+
+async function startServer(): Promise<void> {
+  try {
+    await DBConnection();
+
+    // Create tables in foreign-key dependency order.
+    await createUserTable();
+    await createAccomodationTable();
+    await createRoomsTable();
+    await createBookingTable();
 
     app.listen(PORT, () => {
-        console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`WildHaven API: http://localhost:${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/api/health`);
     });
-};
+  } catch (error) {
+    console.error("WildHaven could not start:", error);
+    await pool.end();
+    process.exit(1);
+  }
+}
 
-startServer()
-
+void startServer();
