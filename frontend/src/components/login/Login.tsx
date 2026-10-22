@@ -1,107 +1,93 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import styles from './Login.module.css';
-import { type AppDispatch, type RootState } from '../../store';
-import { updateLoginField, loginUserThunk } from '../../redux/features/loginSlice';
-import AddRole from '../../redux/features/registerSlice'
-import { type user_role } from '../../types/app.types';
+import type { FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import {
+  loginUserThunk,
+  updateLoginField,
+} from "../../redux/features/loginSlice";
+import styles from "./Login.module.css";
 
+export default function Login() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { form, isLoading, error } = useAppSelector((state) => state.login);
 
-const Login = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    const { role } = useSelector(
-        (state: RootState) => state.register
-    )
+    const result = await dispatch(loginUserThunk(form));
 
+    if (loginUserThunk.fulfilled.match(result)) {
+      navigate(
+        result.payload.user.role === "admin"
+          ? "/admin-dashboard"
+          : "/home",
+        { replace: true },
+      );
+    }
+  }
 
-    const { form, isLoading, error } = useSelector((state: RootState) => state.login);
+  return (
+    <main className={styles.page}>
+      <section className={styles.card}>
+        <Link to="/" className={styles.brand}>WildHaven</Link>
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        <p className={styles.eyebrow}>WELCOME BACK</p>
+        <h1>Find your way back to <span>nature.</span></h1>
+        <p className={styles.intro}>
+          Sign in to manage your account and continue planning your next escape.
+        </p>
 
-        console.log(' Attempting authentication with:', form);
-        const result = await dispatch(loginUserThunk(form));
+        {error && (
+          <div className={styles.error} role="alert">
+            {error}
+          </div>
+        )}
 
-        const userRole = result.payload.role;
-
-
-        console.log('Login response package:', result);
-
-        if (loginUserThunk.fulfilled.match(result)) {
-            console.log(' Auth lifecycle complete.');
-            alert('Welcome back!');
-
-            if (userRole === 'admin') {
-                navigate('/admin-dashboard');
-            } else {
-                navigate('/user-dashboard')
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <label htmlFor="email">Email address</label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={form.email}
+            onChange={(event) =>
+              dispatch(updateLoginField({
+                field: "email",
+                value: event.target.value,
+              }))
             }
+            required
+          />
 
-        } else if (loginUserThunk.rejected.match(result)) {
-            console.error(' Authentication aborted:', result.payload || result.error.message);
-            alert(`Login failed: ${result.payload || "Faka izimfaneko zakhona!"}`);
-        }
-    };
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            value={form.password}
+            onChange={(event) =>
+              dispatch(updateLoginField({
+                field: "password",
+                value: event.target.value,
+              }))
+            }
+            required
+          />
 
-    return (
-        <form className={styles.LoginContainer} onSubmit={handleSubmit}>
-            <div className={styles.LoginContent}>
-                <h1 className={styles.title}>
-                    Please <span className={styles.tGreen}>Login</span> Your Account
-                </h1>
-
-                {error && <p style={{ color: 'red', textAlign: 'center', fontWeight: 'bold' }}>{error}</p>}
-
-                <input
-                    type="email"
-                    placeholder="Enter Your email"
-                    className={styles.loginInput}
-                    value={form.email}
-                    onChange={(e) => dispatch(updateLoginField({ field: 'email', value: e.target.value }))}
-                    required
-                />
-
-                <input
-                    type="password"
-                    placeholder="Enter Your Password"
-                    className={styles.loginInput}
-                    value={form.password}
-                    onChange={(e) => dispatch(updateLoginField({ field: 'password', value: e.target.value }))}
-                    required
-                />
-
-
-                <select
-                    name="role"
-                    className={styles.inputFull}
-                    value={form.role}
-                    onChange={(e) => dispatch(updateLoginField({ field: 'role', value: e.target.value as user_role }))}
-                    required
-                >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
-
-                <button
-                    type="submit"
-                    className={styles.btnLogin}
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Logging in...' : 'Login'}
-                </button>
-
-                <p className={styles.registerText}>
-                    Don't have an account?{' '}
-                    <Link to="/register" className={styles.Linkregister}>
-                        Register
-                    </Link>
-                </p>
-            </div>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Signing you in…" : "Sign in"}
+          </button>
         </form>
-    );
-};
 
-export default Login;
+        <p className={styles.footerText}>
+          New to WildHaven? <Link to="/register">Create an account</Link>
+        </p>
+
+        <Link to="/" className={styles.backLink}>← Back to home</Link>
+      </section>
+    </main>
+  );
+}
