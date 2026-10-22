@@ -1,12 +1,5 @@
-import styles from './Login.module.css'
-import Login from '../../components/login/Login'
+import Login from "../../components/login/Login";
 
-const LoginPage = () => {
-  return (
-    <div>
-      <Login />
-    </div>
-  )
+export default function LoginPage() {
+  return <Login />;
 }
-
-export default LoginPage
