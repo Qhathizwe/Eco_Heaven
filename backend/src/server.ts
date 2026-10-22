@@ -39,12 +39,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "WildHaven API is running.",
-  });
-});
+
 
 app.use("/api", userRouter);
 app.use("/api", accomodationRouter);
@@ -79,7 +74,7 @@ async function startServer(): Promise<void> {
 
     app.listen(PORT, () => {
       console.log(`WildHaven API: http://localhost:${PORT}`);
-      console.log(`Health check: http://localhost:${PORT}/api/health`);
+
     });
   } catch (error) {
     console.error("WildHaven could not start:", error);

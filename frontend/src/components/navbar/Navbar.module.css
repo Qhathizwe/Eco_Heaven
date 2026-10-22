@@ -1,116 +1,232 @@
-
-.NavbarContainer {
-  position: relative;
-  z-index: 500;
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
-  min-height: 88px;
-  padding: 12px clamp(20px, 6%, 90px);
-  background: #e6dcc1;
-  border-bottom: 1px solid #eeeee7;
+  gap: 24px;
+  min-height: 78px;
+  padding: 12px clamp(16px, 5vw, 72px);
+  background: #f7f5ee;
+  border-bottom: 1px solid #e5e3d9;
+  box-shadow: 0 3px 18px rgb(31 51 39 / 5%);
 }
 
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  flex-shrink: 0;
-}
-
-.Logo {
-  display: block;
-  width: 300px;
-  height: 130px;
-  border-radius: 99px;
-
-}
-
-.NavLinks,
-.Actions {
-  display: flex;
-  align-items: center;
-  gap: 30px;
-}
-
-.NavLink {
-  color: #35443a;
-  font-size: 1.125rem;
-  font-weight: 800;
+  gap: 11px;
+  color: #244d3a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 700;
   text-decoration: none;
-  transition: color 0.2s;
+  white-space: nowrap;
 }
 
-.NavLink:hover {
-  color: #8d7546;
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.Actions {
-  gap: 12px;
+.links,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
-.SignInButton,
-.SignUpButton {
-  width: 200px;
-  height: 60px;
-  padding: 12px 19px;
-  border-radius: 4px;
-  font-size: 1.125rem;
+.navLink {
+  color: #35443a;
+  font-size: 0.94rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.navLink:hover {
+  color: #9b7845;
+}
+
+.actions {
+  gap: 10px;
+}
+
+.signIn,
+.join {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid #244d3a;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 160ms ease, color 160ms ease;
 }
 
-.SignInButton {
-  background: transparent;
+.signIn {
   color: #244d3a;
-  border: 1px solid #244d3a;
+  background: transparent;
 }
 
-.SignInButton:hover {
-  background: #f0f4ef;
+.signIn:hover {
+  background: #e8eee7;
 }
 
-.SignUpButton {
-  color: white;
+.join {
+  color: #fff;
   background: #244d3a;
-  border: 1px solid #244d3a;
 }
 
-.SignUpButton:hover {
+.join:hover {
   background: #173627;
 }
 
-@media (max-width: 700px) {
-  .NavbarContainer {
+.profile {
+  position: relative;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 12px 5px 5px;
+  color: #244d3a;
+  background: #fff;
+  border: 1px solid #e0e4dc;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.avatar {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  flex: 0 0 39px;
+  place-items: center;
+  color: #fff;
+  background: #244d3a;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.profileName {
+  max-width: 130px;
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 270px;
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e8e8df;
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgb(0 0 0 / 12%);
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 12px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid #eee;
+}
+
+.menuHeader strong {
+  color: #244d3a;
+}
+
+.menuHeader span,
+.menuHeader small {
+  color: #77796f;
+  font-size: 0.82rem;
+}
+
+.menu button {
+  width: 100%;
+  padding: 12px;
+  color: #35443a;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu button:hover {
+  background: #f3f5ef;
+}
+
+.menu .logout {
+  margin-top: 5px;
+  color: #a93232;
+  border-top: 1px solid #eee;
+  border-radius: 0 0 8px 8px;
+}
+
+@media (max-width: 820px) {
+  .navbar {
     flex-wrap: wrap;
     gap: 12px;
     padding: 12px 18px;
   }
 
-  .Logo {
-    width: 125px;
-    height: 48px;
+  .brand {
+    font-size: 1.2rem;
   }
 
-  .NavLinks {
+  .logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .links {
     order: 3;
     width: 100%;
     justify-content: center;
-    gap: 24px;
-    padding: 10px 0 4px;
+    gap: 16px;
+    padding: 6px 0 2px;
   }
 
-  .Actions {
-    gap: 8px;
-  }
-
-  .SignInButton,
-  .SignUpButton {
-    padding: 10px 12px;
-  }
-
-  .NavLink {
+  .navLink {
     font-size: 0.84rem;
+  }
+
+  .profileName {
+    display: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .navbar {
+    padding-inline: 10px;
+  }
+
+  .brand {
+    font-size: 1.05rem;
+  }
+
+  .links {
+    gap: 12px;
+  }
+
+  .signIn,
+  .join {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
   }
 }
