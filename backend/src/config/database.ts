@@ -1,28 +1,46 @@
-import {Pool} from 'pg'
-import dotenv from 'dotenv'
+import { Pool, QueryResult, QueryResultRow } from "pg";
+import dotenv from "dotenv";
 
 dotenv.config();
 
-const pool = new Pool({
-     user: process.env.DB_USER,
-     host: process.env.DB_HOST,
-     database: process.env.DB_DATABASE,
-     password: process.env.DB_PASSWORD,
-     port: parseInt(process.env.DB_PORT || "5432") 
+const requiredEnvironmentVariables = [
+  "DB_USER",
+  "DB_HOST",
+  "DB_DATABASE",
+  "DB_PASSWORD",
+];
+
+for (const variable of requiredEnvironmentVariables) {
+  if (!process.env[variable]) {
+    throw new Error(`Missing required environment variable: ${variable}`);
+  }
+}
+
+export const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: Number(process.env.DB_PORT || 5432),
+  max: 10,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
 });
 
-export const query = (text: string, params?: any[]) => pool.query(text, params)
+export async function query<T extends QueryResultRow = QueryResultRow>(
+  text: string,
+  params: unknown[] = [],
+): Promise<QueryResult<T>> {
+  return pool.query<T>(text, params);
+}
 
-export const DBConnection = async () => {
-    try
-    {
-        const client = await pool.connect()
-        console.log(`Database connection Successfully!`)
-        client.release()
-    }
-    catch(error)
-    {
-        console.error(`Unable to connect to the database`, error)
-        process.exit
-    }
+export async function DBConnection(): Promise<void> {
+  try {
+    const client = await pool.connect();
+    console.log("PostgreSQL connected successfully.");
+    client.release();
+  } catch (error) {
+    console.error("Unable to connect to PostgreSQL:", error);
+    throw error;
+  }
 }
