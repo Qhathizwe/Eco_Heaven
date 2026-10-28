@@ -1,5 +1,9 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { type Rooms } from "../../types/app.types";
+
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { Rooms } from "../../types/app.types";
+
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 interface RoomState {
     roomList: Rooms[];
@@ -9,7 +13,7 @@ interface RoomState {
         price_per_night: number;
         description: string;
         is_available: boolean;
-        pictures?: string[];
+        pictures: string[];
     };
     editingRoom: Rooms | null;
     isSuccess: boolean;
@@ -22,10 +26,10 @@ const initialState: RoomState = {
     form: {
         accommodation_id: 0,
         room_type: "",
-        price_per_night: 0.0,
+        price_per_night: 0,
         description: "",
         is_available: true,
-        pictures: []
+        pictures: [],
     },
     editingRoom: null,
     isSuccess: false,
@@ -33,195 +37,309 @@ const initialState: RoomState = {
     error: null,
 };
 
-const API_URL = "http://localhost:7000/api";
+function getToken(): string | null {
+    return localStorage.getItem("token");
+}
 
-// CREATE Room
-export const addRoomThunk = createAsyncThunk(
-    'room/addRoom',
-    async (roomData: FormData, thunkAPI) => {
-        try {
-            const response = await fetch(API_URL + '/room', {
-                method: 'POST',
-                body: roomData,
-            });
+async function readResponse(response: Response): Promise<any> {
+    const result = await response.json().catch(() => ({}));
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to create room profile');
-            }
-            return await response.json();
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
+    if (!response.ok) {
+        throw new Error(
+            result.message ||
+            `Request failed with status ${response.status}`
+        );
     }
-);
 
-// READ All Rooms (Filtered by Accommodation ID)
-export const getRoomsByAccommodationThunk = createAsyncThunk(
-    'room/getRoomsByAccommodation',
-    async (accommodationId: number | string, thunkAPI) => {
-        try {
-            const response = await fetch(`${API_URL}/accommodations/${accommodationId}/rooms`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            if (!response.ok) throw new Error('Failed to fetch rooms for this accommodation');
-            return await response.json();
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
-    }
-);
+    return result;
+}
 
-// UPDATE Room
-export const updateRoomThunk = createAsyncThunk(
-    'room/updateRoom',
-    async ({ id, formData }: { id: number | string; formData: FormData }, thunkAPI) => {
-        try {
-            const response = await fetch(`${API_URL}/rooms/${id}`, {
-                method: 'PUT',
-                body: formData,
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to update room record');
-            }
-            return await response.json();
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
-    }
-);
+function extractData<T>(response: any): T {
+    if (response && "data" in response) return response.data as T;
+    if (response && "room" in response) return response.room as T;
+    return response as T;
+}
 
-// DELETE Room
-export const deleteRoomThunk = createAsyncThunk(
-    'room/deleteRoom',
-    async (id: number, thunkAPI) => {
-        try {
-            const response = await fetch(`${API_URL}/rooms/${id}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) throw new Error('Failed to delete room');
-            return id;
-        } catch (error: any) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
+function authHeaders(json = false): HeadersInit {
+    const headers: Record<string, string> = {};
+    const token = getToken();
+
+    if (token) headers.Authorization = `Bearer ${token}`;
+    if (json) headers["Content-Type"] = "application/json";
+
+    return headers;
+}
+
+export const addRoomThunk = createAsyncThunk<
+    Rooms,
+    FormData,
+    { rejectValue: string }
+>("room/addRoom", async (formData, thunkAPI) => {
+
+    try {
+        const payload = Object.fromEntries(formData.entries());
+
+        const response = await fetch(`${API_URL}/rooms`, {
+            method: "POST",
+            headers: {
+                ...authHeaders(true),
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const result = await readResponse(response);
+        return extractData<Rooms>(result);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(
+            error instanceof Error ? error.message : "Failed to create room."
+        );
     }
-);
+});
+
+export const getRoomsByAccommodationThunk = createAsyncThunk<
+    Rooms[],
+    number | string,
+    { rejectValue: string }
+>("room/getRoomsByAccommodation", async (accommodationId, thunkAPI) => {
+    try {
+        const response = await fetch(
+            `${API_URL}/accommodations/${accommodationId}/rooms`
+        );
+
+        const result = await readResponse(response);
+        return extractData<Rooms[]>(result) ?? [];
+    } catch (error) {
+        return thunkAPI.rejectWithValue(
+            error instanceof Error ? error.message : "Failed to fetch rooms."
+        );
+    }
+});
+
+export const getAllRoomsThunk = createAsyncThunk<
+    Rooms[],
+    void,
+    { rejectValue: string }
+>("room/getAllRooms", async (_, thunkAPI) => {
+    try {
+        const response = await fetch(`${API_URL}/rooms`, {
+            headers: authHeaders(),
+        });
+
+        const result = await readResponse(response);
+        return extractData<Rooms[]>(result) ?? [];
+    } catch (error) {
+        return thunkAPI.rejectWithValue(
+            error instanceof Error ? error.message : "Failed to fetch rooms."
+        );
+    }
+});
+
+export const updateRoomThunk = createAsyncThunk<
+    Rooms,
+    { id: number | string; formData: FormData },
+    { rejectValue: string }
+>("room/updateRoom", async ({ id, formData }, thunkAPI) => {
+    try {
+        const payload = Object.fromEntries(formData.entries());
+
+        const response = await fetch(`${API_URL}/rooms/${id}`, {
+            method: "PUT",
+            headers: {
+                ...authHeaders(true),
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const result = await readResponse(response);
+        return extractData<Rooms>(result);
+    } catch (error) {
+        return thunkAPI.rejectWithValue(
+            error instanceof Error ? error.message : "Failed to update room."
+        );
+    }
+});
+
+export const deleteRoomThunk = createAsyncThunk<
+    number,
+    number,
+    { rejectValue: string }
+>("room/deleteRoom", async (id, thunkAPI) => {
+    try {
+        const response = await fetch(`${API_URL}/rooms/${id}`, {
+            method: "DELETE",
+            headers: authHeaders(),
+        });
+
+        await readResponse(response);
+        return id;
+    } catch (error) {
+        return thunkAPI.rejectWithValue(
+            error instanceof Error ? error.message : "Failed to delete room."
+        );
+    }
+});
 
 const roomSlice = createSlice({
-    name: 'room',
+    name: "room",
     initialState,
     reducers: {
-      updateRoomFormField: (
-    state,
-    action: PayloadAction<{ field: keyof RoomState['form']; value: any }>
-) => {
-    const { field, value } = action.payload;
-    
-    if (field === 'price_per_night') {
-        state.form.price_per_night = Number(value) || 0.0;
-    } else if (field === 'accommodation_id') {
-        state.form.accommodation_id = Number(value) || 0;
-    } else if (field === 'pictures') {
-        state.form.pictures = typeof value === 'string' 
-            ? value.split(',').map(i => i.trim()) 
-            : value;
-    } else {
-        // FIX: Cast target field lookup execution context safely using 'as any'
-        (state.form as any)[field] = value;
-    }
-},
+        updateRoomFormField: (
+            state,
+            action: PayloadAction<{
+                field: keyof RoomState["form"];
+                value: unknown;
+            }>
+        ) => {
+            const { field, value } = action.payload;
+
+            switch (field) {
+                case "accommodation_id":
+                    state.form.accommodation_id = Number(value) || 0;
+                    break;
+                case "price_per_night":
+                    state.form.price_per_night = Number(value) || 0;
+                    break;
+                case "is_available":
+                    state.form.is_available = Boolean(value);
+                    break;
+                case "pictures":
+                    state.form.pictures = Array.isArray(value)
+                        ? value.map(String)
+                        : [];
+                    break;
+                case "room_type":
+                case "description":
+                    state.form[field] = String(value ?? "");
+                    break;
+            }
+        },
 
         setEditingRoom: (state, action: PayloadAction<Rooms | null>) => {
             state.editingRoom = action.payload;
+
             if (action.payload) {
+                const room = action.payload;
                 state.form = {
-                    accommodation_id: action.payload.accomodation_id,
-                    room_type: action.payload.room_type,
-                    price_per_night: action.payload.price_per_night,
-                    description: action.payload.description,
-                    is_available: action.payload.is_available,
-                    pictures: action.payload.pictures || []
+                    accommodation_id: Number(
+                        (room as any).accommodation_id ??
+                        (room as any).accomodation_id ??
+                        0
+                    ),
+                    room_type: room.room_type,
+                    price_per_night: Number(room.price_per_night),
+                    description: room.description,
+                    is_available: room.is_available,
+                    pictures: room.pictures ?? [],
                 };
             }
         },
+
         resetRoomForm: (state) => {
-            state.form = { accommodation_id: 0, room_type: "", price_per_night: 0.0, description: "", is_available: true, pictures: [] };
+            state.form = {
+                accommodation_id: 0,
+                room_type: "",
+                price_per_night: 0,
+                description: "",
+                is_available: true,
+                pictures: [],
+            };
             state.editingRoom = null;
             state.error = null;
             state.isSuccess = false;
-            state.isLoading = false;
         },
+
         clearRooms: (state) => {
             state.roomList = [];
-        }
+            state.error = null;
+        },
+
+        clearRoomStatus: (state) => {
+            state.error = null;
+            state.isSuccess = false;
+        },
     },
+
     extraReducers: (builder) => {
         builder
-            // CREATE ROOM
             .addCase(addRoomThunk.pending, (state) => {
                 state.isLoading = true;
+                state.isSuccess = false;
                 state.error = null;
             })
-            .addCase(addRoomThunk.fulfilled, (state, action: PayloadAction<any>) => {
-                const cleanItem = action.payload.room || action.payload;
-                state.roomList.push(cleanItem);
-                state.isSuccess = true;
+            .addCase(addRoomThunk.fulfilled, (state, action) => {
                 state.isLoading = false;
+                state.isSuccess = true;
+                state.roomList = [
+                    action.payload,
+                    ...state.roomList.filter(
+                        (room) => room.id !== action.payload.id
+                    ),
+                ];
             })
             .addCase(addRoomThunk.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload as string;
+                state.error = action.payload ?? "Failed to create room.";
             })
-            // READ ROOMS
+
             .addCase(getRoomsByAccommodationThunk.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(getRoomsByAccommodationThunk.fulfilled, (state, action: PayloadAction<Rooms[]>) => {
+            .addCase(getRoomsByAccommodationThunk.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.roomList = action.payload;
             })
             .addCase(getRoomsByAccommodationThunk.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload as string;
+                state.error = action.payload ?? "Failed to fetch rooms.";
             })
-            // UPDATE ROOM
+
+            .addCase(getAllRoomsThunk.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getAllRoomsThunk.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.roomList = action.payload;
+            })
+            .addCase(getAllRoomsThunk.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload ?? "Failed to fetch rooms.";
+            })
+
             .addCase(updateRoomThunk.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(updateRoomThunk.fulfilled, (state, action: PayloadAction<any>) => {
+            .addCase(updateRoomThunk.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.isSuccess = true;
-
-                const updatedItem = action.payload.room || action.payload;
-                const index = state.roomList.findIndex(item => item.id === updatedItem.id);
-
-                if (index !== -1) {
-                    state.roomList[index] = updatedItem;
-                } else {
-                    state.roomList.push(updatedItem);
-                }
+                state.roomList = state.roomList.map((room) =>
+                    room.id === action.payload.id ? action.payload : room
+                );
             })
             .addCase(updateRoomThunk.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload as string;
+                state.error = action.payload ?? "Failed to update room.";
             })
-            // DELETE ROOM
-            .addCase(deleteRoomThunk.fulfilled, (state, action: PayloadAction<number>) => {
-                state.roomList = state.roomList.filter(item => item.id !== action.payload);
+
+            .addCase(deleteRoomThunk.fulfilled, (state, action) => {
+                state.roomList = state.roomList.filter(
+                    (room) => room.id !== action.payload
+                );
+            })
+            .addCase(deleteRoomThunk.rejected, (state, action) => {
+                state.error = action.payload ?? "Failed to delete room.";
             });
-    }
+    },
 });
 
 export const {
     updateRoomFormField,
     setEditingRoom,
     resetRoomForm,
-    clearRooms
+    clearRooms,
+    clearRoomStatus,
 } = roomSlice.actions;
 
 export default roomSlice.reducer;
