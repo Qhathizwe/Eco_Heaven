@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
-import { type Accomodations, type new_accomodation } from "../../types/app.types";
+import { type Accomodations } from "../../types/app.types";
 
 interface AccomodationState {
     accomodationList: Accomodations[];
@@ -44,7 +44,7 @@ export const addAccomodationThunk = createAsyncThunk(
     'accomodation/addAccomodation',
     async (accomodationData: FormData, thunkAPI) => {
         try {
-            const response = await fetch(API_URL + '/accommodations', {
+            const response = await fetch(API_URL + '/accommodation', {
                 method: 'POST',
                 body: accomodationData,
             });
