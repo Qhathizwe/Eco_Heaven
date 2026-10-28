@@ -131,4 +131,48 @@ export async function getBookingsByUser(userId: number) {
   );
 
   return result.rows;
-}
+};
+
+
+export const getAllBookings = async () => {
+  const result = await query(`
+    SELECT
+      b.id,
+      b.user_id,
+      b.accommodation_id,
+      b.room_id,
+      b.check_in,
+      b.check_out,
+      b.guests,
+      b.status,
+      b.created_at,
+      a.name AS accommodation_name,
+      a.address AS accommodation_address,
+      r.room_type,
+      r.price_per_night,
+      u.name AS customer_name,
+      u.email AS customer_email
+    FROM bookings b
+    INNER JOIN users u ON u.id = b.user_id
+    INNER JOIN accomodations a ON a.id = b.accommodation_id
+    INNER JOIN rooms r ON r.id = b.room_id
+    ORDER BY b.created_at DESC, b.id DESC
+  `);
+
+  return result.rows;
+};
+
+export const updateBookingStatus = async (
+  bookingId: number,
+  status: "pending" | "confirmed" | "cancelled" | "completed"
+) => {
+  const result = await query(
+    `UPDATE bookings
+     SET status = $1
+     WHERE id = $2
+     RETURNING *`,
+    [status, bookingId]
+  );
+
+  return result.rows[0] ?? null;
+};
