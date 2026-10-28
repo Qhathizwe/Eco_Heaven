@@ -74,3 +74,12 @@ export interface CreateBookingInput {
   check_out: string;
   guests: number;
 }
+
+//==================== Favourite & Review ==========================//
+export interface Review {
+  userId: number;
+  accommodationId: number;
+  rating: number;
+  title?: string;
+  comment: string;
+};
