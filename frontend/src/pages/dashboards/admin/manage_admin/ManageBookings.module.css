@@ -1,0 +1,302 @@
+
+.page {
+  min-height: 100vh;
+  padding: 40px clamp(16px, 4vw, 55px);
+  color: #29382e;
+  background: #f5f2e9;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  max-width: 1600px;
+  margin: 0 auto 30px;
+}
+
+.back,
+.refresh {
+  padding: 10px 14px;
+  border: 1px solid #d9dcd0;
+  border-radius: 4px;
+  color: #193b2c;
+  background: transparent;
+  cursor: pointer;
+}
+
+.back {
+  margin-bottom: 23px;
+}
+
+.eyebrow {
+  color: #82897b;
+  font-size: 0.7rem;
+  letter-spacing: 1.7px;
+  font-weight: 700;
+}
+
+.header h1 {
+  margin: 10px 0;
+  font-family: Georgia, serif;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 400;
+}
+
+.header p {
+  color: #7b8175;
+  line-height: 1.6;
+}
+
+.refresh:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+  max-width: 1600px;
+  margin: 0 auto 25px;
+}
+
+.summaryCard {
+  padding: 23px;
+  background: #fffefa;
+  border: 1px solid #e6e4d9;
+  border-radius: 6px;
+}
+
+.summaryCard span {
+  color: #788073;
+  font-size: 0.85rem;
+}
+
+.summaryCard strong {
+  display: block;
+  margin-top: 15px;
+  color: #193b2c;
+  font-family: Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+}
+
+.bookingPanel {
+  max-width: 1600px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #fffefa;
+  border: 1px solid #e6e4d9;
+  border-radius: 7px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #e8e6dd;
+}
+
+.controls input,
+.controls select {
+  min-height: 45px;
+  padding: 11px 13px;
+  color: #304034;
+  background: #fff;
+  border: 1px solid #dcded3;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.controls input {
+  flex: 1;
+  min-width: 0;
+}
+
+.controls select {
+  width: 185px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+}
+
+.table th {
+  padding: 15px;
+  color: #70786c;
+  background: #f7f6ef;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 16px 15px;
+  border-bottom: 1px solid #efeee6;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: #fafaf5;
+}
+
+.table td strong,
+.table td small {
+  display: block;
+}
+
+.table td strong {
+  color: #304034;
+  font-weight: 600;
+}
+
+.table td small {
+  margin-top: 5px;
+  color: #858a7d;
+  line-height: 1.5;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-size: 0.69rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.pending {
+  color: #8b6420;
+  background: #fbefd2;
+}
+
+.confirmed {
+  color: #2b6846;
+  background: #e0f1e3;
+}
+
+.completed {
+  color: #4f5d79;
+  background: #e7ebf5;
+}
+
+.cancelled {
+  color: #9b4541;
+  background: #fae5e1;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 115px;
+}
+
+.actions button {
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.actions button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.confirmButton {
+  color: #245b3b;
+  background: #e0f1e3;
+}
+
+.cancelButton {
+  color: #93433b;
+  background: #fae5e1;
+}
+
+.completeButton {
+  color: #fff;
+  background: #193b2c;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  padding: 30px;
+  color: #7b8175;
+  text-align: center;
+}
+
+.empty > span {
+  font-size: 2rem;
+}
+
+.empty h2 {
+  margin-bottom: 5px;
+  color: #193b2c;
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+.empty p {
+  font-size: 0.85rem;
+}
+
+.error {
+  margin: 15px 20px;
+  padding: 13px;
+  color: #8d2c2c;
+  background: #fff0ed;
+  border-radius: 4px;
+}
+
+.panelFooter {
+  padding: 16px 20px;
+  color: #858a7d;
+  border-top: 1px solid #efeee6;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 800px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .controls select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+}
