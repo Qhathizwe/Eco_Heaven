@@ -13,6 +13,11 @@ import userRouter from "./routes/userRoutes";
 import accomodationRouter from "./routes/accomodationsRoutes";
 import roomRouter from "./routes/roomRoutes";
 import bookingRouter from "./routes/bookingRoutes";
+import reviewRouter from './routes/reviewRoutes'
+import favouriteRouter from './routes/favouritesRoutes'
+import { createReviewTable } from "./services/reviewServices";
+import { createFavouriteTable } from "./services/favouriteServices";
+import paymentRouter from "./routes/paymentRoutes";
 
 const app = express();
 const PORT = Number(process.env.PORT || 7000);
@@ -41,10 +46,13 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 
 
-app.use("/api", userRouter);
-app.use("/api", accomodationRouter);
+app.use("/api/users", userRouter);
+app.use("/api/accommodations", accomodationRouter); 
 app.use("/api", roomRouter);
-app.use("/api", bookingRouter);
+app.use("/api/bookings", bookingRouter);
+app.use("/api", reviewRouter);
+app.use("/api", favouriteRouter);
+app.use("/api", paymentRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "API endpoint not found." });
@@ -66,11 +74,12 @@ async function startServer(): Promise<void> {
   try {
     await DBConnection();
 
-    // Create tables in foreign-key dependency order.
     await createUserTable();
     await createAccomodationTable();
     await createRoomsTable();
     await createBookingTable();
+    await createReviewTable();
+    await createFavouriteTable();
 
     app.listen(PORT, () => {
       console.log(`WildHaven API: http://localhost:${PORT}`);
