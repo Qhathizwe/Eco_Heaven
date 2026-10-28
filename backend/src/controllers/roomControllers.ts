@@ -1,139 +1,232 @@
-import type { Request, Response } from "express";
+
+import { Request, Response } from "express";
 import * as roomService from "../services/roomServices";
 
-export async function addRoomController(
+export const addRoomController = async (
   req: Request,
-  res: Response,
-): Promise<void> {
+  res: Response
+): Promise<void> => {
   try {
     const accommodationId = Number(
-      req.body.accommodation_id ?? req.body.accomodation_id,
+      req.body.accommodation_id ?? req.body.accomodation_id
     );
-    const price = Number(req.body.price_per_night);
-    const { room_type, description, is_available } = req.body;
+
+    const room_type = String(req.body.room_type ?? "").trim();
+    const price_per_night = Number(req.body.price_per_night);
+    const description = String(req.body.description ?? "").trim();
+
+    const is_available =
+      req.body.is_available === undefined
+        ? true
+        : req.body.is_available === true ||
+          req.body.is_available === "true";
+
+    const pictures = Array.isArray(req.body.pictures)
+      ? req.body.pictures
+      : typeof req.body.pictures === "string" &&
+          req.body.pictures.trim()
+        ? [req.body.pictures.trim()]
+        : [];
 
     if (
       !Number.isInteger(accommodationId) ||
-      accommodationId < 1 ||
-      typeof room_type !== "string" ||
-      !room_type.trim() ||
-      !Number.isFinite(price) ||
-      price < 0
+      accommodationId <= 0 ||
+      !room_type ||
+      !description ||
+      !Number.isFinite(price_per_night) ||
+      price_per_night <= 0
     ) {
       res.status(400).json({
-        message: "A valid accommodation, room type and nightly price are required.",
+        success: false,
+        message:
+          "Provide a valid accommodation, room type, description and price greater than zero.",
       });
       return;
     }
 
-    const pictures = Array.isArray(req.body.pictures)
-      ? req.body.pictures
-      : [];
-
     const room = await roomService.addRoomService({
       accommodation_id: accommodationId,
       room_type,
-      price_per_night: price,
-      description: typeof description === "string" ? description : "",
-      is_available:
-        typeof is_available === "boolean" ? is_available : true,
+      price_per_night,
+      description,
+      is_available,
       pictures,
     });
 
     res.status(201).json({
+      success: true,
+      data: room,
       message: "Room created successfully.",
-      room,
     });
   } catch (error) {
-    console.error("Create room error:", error);
-    res.status(500).json({ message: "Unable to create room." });
+    console.error("Add room error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Could not create room. Check the backend terminal for details.",
+    });
   }
-}
+};
 
-export async function getAllRoomsController(
+export const getAllRoomsController = async (
   _req: Request,
-  res: Response,
-): Promise<void> {
+  res: Response
+): Promise<void> => {
   try {
-    res.status(200).json(await roomService.getAllRooms());
+    const rooms = await roomService.getAllRooms();
+
+    res.status(200).json({
+      success: true,
+      data: rooms ?? [],
+    });
   } catch (error) {
-    console.error("Get rooms error:", error);
-    res.status(500).json({ message: "Unable to retrieve rooms." });
+    console.error("Fetch all rooms error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Could not fetch rooms.",
+    });
   }
-}
+};
 
-export async function getRoomsByAccommodationController(
+export const getRoomsByAccommodationController = async (
   req: Request,
-  res: Response,
-): Promise<void> {
-  const accommodationId = Number(req.params.accommodationId);
-
-  if (!Number.isInteger(accommodationId) || accommodationId < 1) {
-    res.status(400).json({ message: "Invalid accommodation ID." });
-    return;
-  }
-
+  res: Response
+): Promise<void> => {
   try {
-    res.status(200).json(
-      await roomService.getRoomsByAccommodationService(accommodationId),
-    );
+    const accommodationId = Number(req.params.accommodationId);
+
+    if (!Number.isInteger(accommodationId) || accommodationId <= 0) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid accommodation ID.",
+      });
+      return;
+    }
+
+    const rooms =
+      await roomService.getRoomsByAccommodationService(accommodationId);
+
+    res.status(200).json({
+      success: true,
+      data: rooms,
+    });
   } catch (error) {
-    console.error("Get accommodation rooms error:", error);
-    res.status(500).json({ message: "Unable to retrieve rooms." });
+    console.error("Fetch accommodation rooms error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Could not fetch rooms for this accommodation.",
+    });
   }
-}
+};
 
-export async function updateRoomController(
+export const updateRoomController = async (
   req: Request,
-  res: Response,
-): Promise<void> {
-  const id = Number(req.params.id);
-
-  if (!Number.isInteger(id) || id < 1) {
-    res.status(400).json({ message: "Invalid room ID." });
-    return;
-  }
-
+  res: Response
+): Promise<void> => {
   try {
-    const updated = await roomService.updateRoomService(id, req.body);
+    const id = Number(req.params.id);
 
-    if (!updated) {
-      res.status(404).json({ message: "Room not found." });
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid room ID.",
+      });
+      return;
+    }
+
+    const body = req.body;
+    const updateData: Record<string, unknown> = {};
+
+    if (body.room_type !== undefined) {
+      updateData.room_type = String(body.room_type).trim();
+    }
+
+    if (body.price_per_night !== undefined) {
+      const price = Number(body.price_per_night);
+
+      if (!Number.isFinite(price) || price <= 0) {
+        res.status(400).json({
+          success: false,
+          message: "Room price must be greater than zero.",
+        });
+        return;
+      }
+
+      updateData.price_per_night = price;
+    }
+
+    if (body.description !== undefined) {
+      updateData.description = String(body.description).trim();
+    }
+
+    if (body.is_available !== undefined) {
+      updateData.is_available =
+        body.is_available === true || body.is_available === "true";
+    }
+
+    if (body.pictures !== undefined) {
+      updateData.pictures = Array.isArray(body.pictures)
+        ? body.pictures
+        : [String(body.pictures)];
+    }
+
+    const room = await roomService.updateRoomService(id, updateData);
+
+    if (!room) {
+      res.status(404).json({
+        success: false,
+        message: "Room not found.",
+      });
       return;
     }
 
     res.status(200).json({
+      success: true,
+      data: room,
       message: "Room updated successfully.",
-      room: updated,
     });
   } catch (error) {
     console.error("Update room error:", error);
-    res.status(500).json({ message: "Unable to update room." });
+    res.status(500).json({
+      success: false,
+      message: "Could not update room.",
+    });
   }
-}
+};
 
-export async function deleteRoomController(
+export const deleteRoomController = async (
   req: Request,
-  res: Response,
-): Promise<void> {
-  const id = Number(req.params.id);
-
-  if (!Number.isInteger(id) || id < 1) {
-    res.status(400).json({ message: "Invalid room ID." });
-    return;
-  }
-
+  res: Response
+): Promise<void> => {
   try {
-    const deleted = await roomService.deleteRoomService(id);
+    const id = Number(req.params.id);
 
-    if (!deleted) {
-      res.status(404).json({ message: "Room not found." });
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid room ID.",
+      });
       return;
     }
 
-    res.status(200).json({ message: "Room deleted successfully." });
+    const deleted = await roomService.deleteRoomService(id);
+
+    if (!deleted) {
+      res.status(404).json({
+        success: false,
+        message: "Room not found.",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Room deleted successfully.",
+    });
   } catch (error) {
     console.error("Delete room error:", error);
-    res.status(500).json({ message: "Unable to delete room." });
+    res.status(500).json({
+      success: false,
+      message: "Could not delete room.",
+    });
   }
-}
+};
