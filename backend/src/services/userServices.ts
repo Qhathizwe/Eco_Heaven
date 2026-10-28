@@ -178,4 +178,84 @@ export async function deleteUser(
 
   const deleted = result.rows[0];
   return deleted ? toPublicUser(deleted) : null;
+};
+
+export async function updateOwnProfile(
+  id: number,
+  input: {
+    name: string;
+    surname: string;
+    email: string;
+    phone: string;
+  },
+): Promise<PublicUser | null> {
+  const result = await query<User>(
+    `
+      UPDATE users
+      SET name = $1,
+          surname = $2,
+          email = $3,
+          phone = $4
+      WHERE id = $5
+      RETURNING id, name, surname, email, password, phone, role, created_at
+    `,
+    [
+      input.name.trim(),
+      input.surname.trim(),
+      input.email.trim().toLowerCase(),
+      input.phone.trim(),
+      id,
+    ],
+  );
+
+  const updated = result.rows[0];
+  return updated ? toPublicUser(updated) : null;
+}
+
+export async function changeOwnPassword(
+  id: number,
+  currentPassword: string,
+  newPassword: string,
+): Promise<boolean> {
+  const user = await findUserById(id);
+
+  if (!user) {
+    return false;
+  }
+
+  const passwordMatches = await bcrypt.compare(
+    currentPassword,
+    user.password,
+  );
+
+  if (!passwordMatches) {
+    throw new Error("CURRENT_PASSWORD_INCORRECT");
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  const result = await query(
+    `
+      UPDATE users
+      SET password = $1
+      WHERE id = $2
+    `,
+    [passwordHash, id],
+  );
+
+  return (result.rowCount ?? 0) > 0;
+};
+
+export async function getUserFavourites(id: number): Promise<any[]> {
+  const result = await query(
+    `
+    SELECT a.*, f.created_at AS favourited_at
+    FROM accommodation_favourites f
+    JOIN accomodations a ON a.id = f.accommodation_id
+    WHERE f.user_id = $1
+    `,
+    [id],
+  );
+
+  return result.rows;
 }
