@@ -13,37 +13,34 @@ import { protect, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Public accommodation browsing
-router.get("/accommodations", getAllAccomodationsController);
-router.get("/accommodations/search", getAccomodationByNameController);
-router.get(
-  "/accommodations/province/:province",
-  getAccomodationByProvinceController,
-);
-router.get("/accommodations/:id", getAccomodationByIdController);
+// Public routes (maps to /api/accommodations...)
+router.get("/", getAllAccomodationsController);
+router.get("/search", getAccomodationByNameController);
+router.get("/province/:province", getAccomodationByProvinceController);
+router.get("/:id", getAccomodationByIdController);
 
-// Admin-only accommodation management
+// Admin routes (maps to /api/accommodations...)
 router.post(
-  "/accommodations",
+  "/",
   protect,
   requireAdmin,
   upload.array("pictures", 10),
-  createAccomodationController,
+  createAccomodationController
 );
 
 router.put(
-  "/accommodations/:id",
+  "/:id",
   protect,
   requireAdmin,
   upload.array("pictures", 10),
-  updateAccomodationController,
+  updateAccomodationController
 );
 
 router.delete(
-  "/accommodations/:id",
+  "/:id",
   protect,
   requireAdmin,
-  deleteAccomodationController,
+  deleteAccomodationController
 );
 
 export default router;
