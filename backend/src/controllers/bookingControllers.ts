@@ -105,4 +105,73 @@ export async function getMyBookingsController(
     console.error("Get my bookings error:", error);
     res.status(500).json({ message: "Unable to retrieve your bookings." });
   }
-}
+};
+
+
+export const getAllBookingsController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const bookings = await bookingServices.getAllBookings();
+
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Admin bookings error:", error);
+
+    return res.status(500).json({
+      message: "Unable to retrieve all bookings.",
+    });
+  }
+};
+
+export const updateBookingStatusController = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const bookingId = Number(req.params.id);
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "pending",
+      "confirmed",
+      "cancelled",
+      "completed",
+    ];
+
+    if (!Number.isInteger(bookingId) || bookingId < 1) {
+      return res.status(400).json({
+        message: "Invalid booking ID.",
+      });
+    }
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid booking status.",
+      });
+    }
+
+    const booking = await bookingServices.updateBookingStatus(
+      bookingId,
+      status
+    );
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found.",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Booking status updated successfully.",
+      booking,
+    });
+  } catch (error) {
+    console.error("Update booking status error:", error);
+
+    return res.status(500).json({
+      message: "Unable to update booking status.",
+    });
+  }
+};
