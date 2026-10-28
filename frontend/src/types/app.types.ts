@@ -46,8 +46,8 @@ export interface Booking {
   user_id: number;
   accommodation_id: number;
   room_id: number;
-  check_in: string;
-  check_out: string;
+  check_in: Date;
+  check_out: Date;
   guests: number;
   status: booking_status;
   created_at?: string;
@@ -59,3 +59,37 @@ export interface Booking {
 }
 
 export type new_booking = Omit<Booking, "id">;
+
+//==================== Favourite & Review ==========================//
+export interface Review {
+  userId: number;
+  accommodationId: number;
+  rating: number;
+  title?: string;
+  comment: string;
+};
+
+//===================== User Profile  ==========================//
+export interface UserProfile {
+  id?: number;
+  name?: string;
+  first_name?: string;
+  surname?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+  created_at?: string;
+  profile_picture?: string;
+}
+
+//===================== Favourite Accommodation  ==========================//
+export interface FavouriteAccommodation {
+  id: number;
+  name: string;
+  address?: string;
+  province?: string;
+  star_rating?: number;
+  pictures?: string[] | string;
+  description?: string;
+}
