@@ -3,7 +3,7 @@ import {
   createSlice,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import type { user_role, User } from "../../types/app.types";
+import type {  User } from "../../types/app.types";
 
 const API_URL = (
   import.meta.env.VITE_API_URL || "http://localhost:7000/api"
@@ -44,7 +44,7 @@ export const loginUserThunk = createAsyncThunk<
   { rejectValue: string }
 >("auth/login", async (credentials, thunkAPI) => {
   try {
-    const response = await fetch(`${API_URL}/login`, {
+    const response = await fetch(`${API_URL}/users/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
