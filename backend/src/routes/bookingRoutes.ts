@@ -2,12 +2,19 @@ import { Router } from "express";
 import {
   createBookingController,
   getMyBookingsController,
+  getAllBookingsController,
+  updateBookingStatusController,
 } from "../controllers/bookingControllers";
-import { protect } from "../middleware/authMiddleware";
+import { protect, requireAdmin } from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post("/bookings", protect, createBookingController);
-router.get("/bookings/my", protect, getMyBookingsController);
+//  Relative to /api/bookings
+router.post("/", protect, createBookingController);
+router.get("/my", protect, getMyBookingsController);
+
+// Admin-only routes
+router.get("/admin", protect, requireAdmin, getAllBookingsController);
+router.patch("/:id/status", protect, requireAdmin, updateBookingStatusController);
 
 export default router;
