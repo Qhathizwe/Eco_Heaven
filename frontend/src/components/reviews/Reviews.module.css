@@ -1,0 +1,296 @@
+
+.section {
+  --forest: #173f35;
+  --cream: #f7f5ef;
+  --muted: #79817a;
+  --line: #e4e5dc;
+
+  padding: 72px 0;
+  color: #26352e;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  color: var(--forest);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+}
+
+.heading h2 {
+  margin: 12px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 3.6vw, 44px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.ratingSummary {
+  display: flex;
+  min-width: 105px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.ratingSummary strong {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  font-weight: 400;
+}
+
+.stars,
+.reviewStars {
+  color: #b58a45;
+  letter-spacing: 2px;
+}
+
+.ratingSummary small,
+.reviewTop small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.reviewForm {
+  display: grid;
+  gap: 18px;
+  padding: 26px;
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  background: #fffefa;
+}
+
+.reviewForm h3 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  color: #34453b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.label input,
+.label textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #dedfd6;
+  border-radius: 2px;
+  outline: none;
+  background: white;
+  color: #26352e;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.label input:focus,
+.label textarea:focus {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgb(23 63 53 / 8%);
+}
+
+.label textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.label > small {
+  align-self: flex-end;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.ratingPicker {
+  display: flex;
+  gap: 7px;
+}
+
+.ratingPicker button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 30px;
+}
+
+.starSelected {
+  color: #b58a45;
+}
+
+.starUnselected {
+  color: #d9ddd5;
+}
+
+.submitButton {
+  justify-self: start;
+  min-height: 45px;
+  padding: 0 19px;
+  border: 0;
+  background: var(--forest);
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.submitButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.error,
+.success {
+  margin: 0;
+  font-size: 12px;
+}
+
+.error {
+  color: #a33434;
+}
+
+.success {
+  color: #236749;
+}
+
+.signInNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 22px;
+  margin-top: 25px;
+  background: var(--cream);
+}
+
+.signInNotice p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.signInNotice a {
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.reviewList {
+  display: grid;
+  gap: 0;
+}
+
+.reviewCard {
+  display: flex;
+  gap: 17px;
+  padding: 27px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3ebe1;
+  color: var(--forest);
+  font-family: Georgia, serif;
+  font-size: 20px;
+}
+
+.reviewBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.reviewTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.reviewTop h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.reviewBody h4 {
+  margin: 16px 0 6px;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.reviewBody p {
+  margin: 12px 0 0;
+  color: #68736a;
+  font-size: 13px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.reviewStars {
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.reviewStars span {
+  color: #dedfd6;
+}
+
+.emptyState {
+  padding: 28px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .heading {
+    align-items: flex-start;
+  }
+
+  .ratingSummary strong {
+    font-size: 32px;
+  }
+
+  .reviewForm {
+    padding: 19px;
+  }
+
+  .reviewCard {
+    gap: 12px;
+  }
+
+  .reviewTop {
+    flex-direction: column;
+    gap: 9px;
+  }
+}
