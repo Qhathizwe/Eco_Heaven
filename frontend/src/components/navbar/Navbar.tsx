@@ -129,7 +129,7 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <button role="menuitem" onClick={() => goTo("/profile")}>
+                    <button role="menuitem" onClick={() => goTo("/users/profile")}>
                       My profile
                     </button>
                     <button role="menuitem" onClick={() => goTo("/my-bookings")}>
