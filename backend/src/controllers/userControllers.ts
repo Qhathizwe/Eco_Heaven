@@ -39,7 +39,6 @@ export async function createUserController(
       return;
     }
 
-    // Never accept the role from public registration.
     const user = await userServices.createUser({
       name,
       surname,
@@ -245,5 +244,174 @@ export async function deleteUserController(
   } catch (error) {
     console.error("Delete user error:", error);
     res.status(500).json({ message: "Unable to delete user." });
+  }
+}
+
+export async function getOwnProfile(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const userId = req.tokenData?.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: "Authentication required." });
+      return;
+    }
+
+    const user = await userServices.findUserById(userId);
+
+    if (!user) {
+      res.status(404).json({ message: "User profile not found." });
+      return;
+    }
+
+    const {
+      password: _passwordHash,
+      ...safeUser
+    } = user;
+
+    res.status(200).json({ user: safeUser });
+  } catch (error) {
+    console.error("Get own profile error:", error);
+    res.status(500).json({ message: "Unable to retrieve your profile." });
+  }
+}
+
+export async function updateOwnProfileController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const userId = req.tokenData?.userId;
+
+  if (!userId) {
+    res.status(401).json({ message: "Authentication required." });
+    return;
+  }
+
+  const { name, surname, email, phone } = req.body;
+
+  if (
+    typeof name !== "string" ||
+    typeof surname !== "string" ||
+    typeof email !== "string" ||
+    typeof phone !== "string" ||
+    !name.trim() ||
+    !surname.trim() ||
+    !email.trim() ||
+    !phone.trim()
+  ) {
+    res.status(400).json({
+      message: "Name, surname, email and phone are required.",
+    });
+    return;
+  }
+
+  try {
+    const updated = await userServices.updateOwnProfile(userId, {
+      name,
+      surname,
+      email,
+      phone,
+    });
+
+    if (!updated) {
+      res.status(404).json({ message: "User profile not found." });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully.",
+      user: updated,
+    });
+  } catch (error: unknown) {
+    const dbError = error as { code?: string };
+
+    if (dbError.code === "23505") {
+      res.status(409).json({
+        message: "That email address is already registered.",
+      });
+      return;
+    }
+
+    console.error("Update own profile error:", error);
+    res.status(500).json({ message: "Unable to update your profile." });
+  }
+}
+
+export async function changeOwnPasswordController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const userId = req.tokenData?.userId;
+
+  if (!userId) {
+    res.status(401).json({ message: "Authentication required." });
+    return;
+  }
+
+  const { currentPassword, newPassword } = req.body;
+
+  if (
+    typeof currentPassword !== "string" ||
+    typeof newPassword !== "string" ||
+    !currentPassword ||
+    !newPassword
+  ) {
+    res.status(400).json({
+      message: "Current password and new password are required.",
+    });
+    return;
+  }
+
+  try {
+    const changed = await userServices.changeOwnPassword(
+      userId,
+      currentPassword,
+      newPassword,
+    );
+
+    if (!changed) {
+      res.status(404).json({ message: "User account not found." });
+      return;
+    }
+
+    res.status(200).json({
+      message: "Password changed successfully.",
+    });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "CURRENT_PASSWORD_INCORRECT"
+    ) {
+      res.status(400).json({
+        message: "Your current password is incorrect.",
+      });
+      return;
+    }
+
+    console.error("Change password error:", error);
+    res.status(500).json({ message: "Unable to change your password." });
+  }
+}
+
+// 👇 NEW: Added to support /api/users/me/favourites
+export async function getUserFavouritesController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const userId = req.tokenData?.userId;
+
+  if (!userId) {
+    res.status(401).json({ message: "Authentication required." });
+    return;
+  }
+
+  try {
+    const favourites = await userServices.getUserFavourites(userId);
+    res.status(200).json({ favourites });
+  } catch (error) {
+    console.error("Get user favourites error:", error);
+    res.status(500).json({ message: "Unable to retrieve your favourites." });
   }
 }
