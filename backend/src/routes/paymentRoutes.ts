@@ -1,3 +1,4 @@
+// src/routes/paymentRoutes.ts
 import { Router } from "express";
 import { protect } from "../middleware/authMiddleware";
 import {
@@ -7,7 +8,7 @@ import {
 
 const router = Router();
 
-router.post("/payments/initialize", protect, initializePaymentController);
-router.get("/payments/verify/:reference", protect, verifyPaymentController);
+router.post("/initialize", protect, initializePaymentController);
+router.get("/verify/:reference", protect, verifyPaymentController);
 
 export default router;

@@ -9,6 +9,7 @@ import bookingSlice from './redux/features/BookingsSlice'
 import profileSlice from './redux/features/profileSlice'
 import reviewSlice from './redux/features/reviewSlice'
 import favouriteSlice from './redux/features/favouriteSlice'
+import paymentSlice from './redux/features/paymentSlice'
 
 
 export const store = configureStore({
@@ -21,7 +22,8 @@ export const store = configureStore({
     booking: bookingSlice,
     profile: profileSlice,
     review: reviewSlice,
-    favourite: favouriteSlice
+    favourite: favouriteSlice,
+    payment: paymentSlice
 
   },
 });

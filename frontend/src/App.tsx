@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/dashboards/admin/AdminDashBoard";
 import UserDashboard from "./pages/dashboards/user/UserDashboard";
 import MyBookings from "./pages/dashboards/user/MyBookings";
 import ProfilePage from './pages/profile/Profile'
+import BookingSuccess from "./pages/bookings/BookingSuccess";
 
 import ManageAccomodations from "./pages/dashboards/admin/manage_admin/ManageAccomodations";
 import ManageRooms from "./pages/dashboards/admin/manage_admin/ManageRooms";
@@ -30,6 +31,7 @@ export default function App() {
       <Route path="/home" element={<UserDashboard />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/users/profile" element={<ProfilePage />} />
+      <Route path="/payment-success" element={<BookingSuccess/>} />
 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
       <Route path="/admin/accommodations" element={<ManageAccomodations />} />

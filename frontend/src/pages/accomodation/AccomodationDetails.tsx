@@ -9,6 +9,8 @@ import {
   removeFavourite,
   fetchFavourites,
 } from "../../redux/features/favouriteSlice";
+import { initializePaymentThunk } from "../../redux/features/paymentSlice";
+import { createBookingThunk } from "../../redux/features/BookingsSlice";
 
 import Navbar from "../../components/navbar/Navbar";
 import Review from "../../components/reviews/Reviews";
@@ -16,7 +18,10 @@ import Review from "../../components/reviews/Reviews";
 import styles from "./AccomodationDetails.module.css";
 import heroPlaceholder from "../../assets/hero-image.jpg";
 
-const API_ORIGIN = "http://localhost:7000";
+
+
+
+const API_ORIGIN = "http://localhost:7000/api";
 
 const today = new Date();
 
@@ -25,9 +30,6 @@ defaultCheckIn.setDate(today.getDate() + 1);
 
 const defaultCheckOut = new Date(defaultCheckIn);
 defaultCheckOut.setDate(defaultCheckIn.getDate() + 3);
-
-// Declare PaystackPop globally for TypeScript
-declare const PaystackPop: any;
 
 /**
  * Convert a Date into the YYYY-MM-DD format required by date inputs.
@@ -145,6 +147,8 @@ const AccommodationDetails = () => {
 
   const [guestsCount, setGuestsCount] = useState(2);
   const [bookingMessage, setBookingMessage] = useState("");
+  // Messages about booking / payment (shown inside the booking card).
+  const [checkoutMessage, setCheckoutMessage] = useState("");
   const [galleryIndex, setGalleryIndex] = useState(0);
 
   const { accomodationList, isLoading: isAccomLoading } =
@@ -155,7 +159,9 @@ const AccommodationDetails = () => {
 
   // Access backend favourites state from Redux
   const { ids: favouriteIds } = useAppSelector((state) => state.favourite);
-  const user = useAppSelector((state) => state.user);
+  const { isInitializing } = useAppSelector((state) => state.payment);
+  const { isCreating } = useAppSelector((state) => state.booking);
+  const isBusy = isInitializing || isCreating;
 
   // Check if current accommodation ID is saved in Redux favourites state
   const isFavourite = favouriteIds.includes(accommodationId);
@@ -163,13 +169,6 @@ const AccommodationDetails = () => {
   // Find the accommodation currently being viewed.
   const accommodation = accomodationList.find(
     (item) => Number(item.id) === accommodationId
-  );
-
-  const userId = Number(
-    (user as any)?.id ??
-    (user as any)?.user?.id ??
-    (user as any)?.user?.user_id ??
-    0
   );
 
   const token = localStorage.getItem("token");
@@ -371,79 +370,95 @@ const AccommodationDetails = () => {
   }
 
   /**
-   * Validate reservation details and initialize Paystack payment.
+   * Checks shared by both booking options. Returns true when OK to continue.
    */
-  async function handleReserve() {
-    setBookingMessage("");
+  function validateReservation(): boolean {
+    setCheckoutMessage("");
 
-    const currentToken = localStorage.getItem("token");
-
-    if (!currentToken) {
-      setBookingMessage("Please sign in before making a reservation.");
+    if (!localStorage.getItem("token")) {
+      setCheckoutMessage("Please sign in before making a reservation.");
       navigate("/login");
-      return;
+      return false;
     }
 
-    if (!selectedRoom) {
-      setBookingMessage("Please select a room first.");
-      return;
-    }
-
-    if (selectedRoom.is_available === false) {
-      setBookingMessage("This room is currently unavailable.");
-      return;
+    if (!selectedRoom || selectedRoom.is_available === false) {
+      setCheckoutMessage("Please select an available room.");
+      return false;
     }
 
     if (nights <= 0) {
-      setBookingMessage("Check-out must be after check-in.");
-      return;
+      setCheckoutMessage("Check-out must be after check-in.");
+      return false;
     }
 
-    const todayValue = toDateInputValue(today);
-
-    if (checkInDate < todayValue) {
-      setBookingMessage("Check-in cannot be in the past.");
-      return;
+    if (checkInDate < toDateInputValue(today)) {
+      setCheckoutMessage("Check-in cannot be in the past.");
+      return false;
     }
 
-    try {
-      setBookingMessage("Initializing secure checkout...");
-
-      // 1. Get payment session and authorization_url from backend
-      const response = await fetch("http://localhost:7000/api/payments/initialize", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-        },
-        body: JSON.stringify({
-          email: (user as any)?.email || (user as any)?.user?.email || "guest@wildhaven.co.za",
-          amount: grandTotal,
-          bookingDetails: {
-            accommodation_id: accommodationId,
-            room_id: selectedRoom.id,
-            check_in: checkInDate,
-            check_out: checkOutDate,
-            guests: guestsCount,
-          },
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!result.success || !result.data?.authorization_url) {
-        setBookingMessage(result.message || "Failed to initialize checkout.");
-        return;
-      }
-
-      //  Redirect user directly to Paystack's full-screen secure checkout page
-      window.location.href = result.data.authorization_url;
-
-    } catch (error: any) {
-      console.error("Payment redirect error:", error);
-      setBookingMessage("Unable to connect to payment server.");
-    }
+    return true;
   }
+
+  /**
+   * Option A - Book now, pay on site.
+   * The booking is created straight away with status "pending", then the
+   * guest is taken to the success page.
+   * If the room is already booked for those dates the server replies with a
+   * "fully booked" message, which is shown here.
+   */
+  async function handlePayOnSite() {
+    if (!validateReservation()) return;
+
+    const result = await dispatch(
+      createBookingThunk({
+        accommodation_id: accommodationId,
+        room_id: selectedRoom.id,
+        check_in: checkInDate,
+        check_out: checkOutDate,
+        guests: guestsCount,
+      })
+    );
+
+    if (createBookingThunk.fulfilled.match(result)) {
+      navigate(`/payment-success?booking=${result.payload.id}`);
+      return;
+    }
+
+    setCheckoutMessage(
+      (result.payload as string) || "Unable to complete your booking."
+    );
+  }
+
+  /**
+   * Option B - Pay online now.
+   * The server checks availability (and replies "fully booked" on a clash),
+   * then the guest goes to Paystack. After a successful payment Paystack
+   * returns them to /booking/success?reference=..., where the payment is
+   * verified and the booking is created with status "confirmed".
+   */
+  async function handlePayOnline() {
+    if (!validateReservation()) return;
+
+    const result = await dispatch(
+      initializePaymentThunk({
+        accommodation_id: accommodationId,
+        room_id: selectedRoom.id,
+        check_in: checkInDate,
+        check_out: checkOutDate,
+        guests: guestsCount,
+      })
+    );
+
+    if (initializePaymentThunk.fulfilled.match(result)) {
+      window.location.href = result.payload; // Paystack checkout
+      return;
+    }
+
+    setCheckoutMessage(
+      (result.payload as string) || "Unable to start online payment."
+    );
+  }
+
   return (
     <div className={styles.page}>
       <Navbar />
@@ -929,21 +944,45 @@ const AccommodationDetails = () => {
                 </div>
               )}
 
-              <button
-                type="button"
-                className={styles.reserveButtonMain}
-                disabled={
-                  !selectedRoom ||
-                  selectedRoom.is_available === false ||
-                  nights <= 0
-                }
-                onClick={handleReserve}
-              >
-                Continue reservation →
-              </button>
+              {checkoutMessage && (
+                <p className={styles.checkoutMessage} role="alert">
+                  {checkoutMessage}
+                </p>
+              )}
+
+              <div className={styles.buttonGroup}>
+                <button
+                  type="button"
+                  className={styles.reserveButtonMain}
+                  disabled={
+                    !selectedRoom ||
+                    selectedRoom.is_available === false ||
+                    nights <= 0 ||
+                    isBusy
+                  }
+                  onClick={handlePayOnSite}
+                >
+                  {isCreating ? "Booking..." : "Book now & pay on site"}
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.payOnlineButton}
+                  disabled={
+                    !selectedRoom ||
+                    selectedRoom.is_available === false ||
+                    nights <= 0 ||
+                    isBusy
+                  }
+                  onClick={handlePayOnline}
+                >
+                  {isInitializing ? "Opening checkout..." : "Pay online now (Paystack) →"}
+                </button>
+              </div>
 
               <p className={styles.secureNote}>
-                Your reservation must be confirmed by the booking service.
+                Pay on site: your booking is pending until our team confirms it.
+                Pay online: your booking is confirmed as soon as payment succeeds.
               </p>
             </div>
           </aside>

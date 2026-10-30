@@ -26,6 +26,7 @@ export async function createBookingTable(): Promise<void> {
       check_in DATE NOT NULL,
       check_out DATE NOT NULL,
       guests INTEGER NOT NULL DEFAULT 1 CHECK (guests > 0),
+      payment_reference VARCHAR(255) UNIQUE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
       status booking_status NOT NULL DEFAULT 'pending',
       CHECK (check_out > check_in)

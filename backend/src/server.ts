@@ -49,14 +49,14 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/users", userRouter);
 app.use("/api/accommodations", accomodationRouter); 
 app.use("/api", roomRouter);
-app.use("/api/bookings", bookingRouter);
+app.use("/api", bookingRouter);
 app.use("/api", reviewRouter);
 app.use("/api", favouriteRouter);
-app.use("/api", paymentRouter);
+app.use("/api/payments", paymentRouter);
 
-app.use((_req, res) => {
-  res.status(404).json({ message: "API endpoint not found." });
-});
+// app.use((_req, res) => {
+//   res.status(404).json({ message: "API endpoint not found." });
+
 
 app.use(
   (
