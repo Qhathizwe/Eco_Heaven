@@ -38,7 +38,7 @@ export const RegisterThunk = createAsyncThunk<
   { rejectValue: string }
 >("users/register", async (form, thunkAPI) => {
   try {
-    const response = await fetch(`${API_URL}/register`, {
+    const response = await fetch(`${API_URL}/users/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
