@@ -5,7 +5,7 @@ import {
     addRoomThunk, 
     updateRoomThunk 
 } from "../../../redux/features/roomSlice";
-import styles from "./AddRoomModal.module.css";
+import styles from "./addRoomModal.module.css";
 
 interface AddRoomModalProps {
     isOpen: boolean;
