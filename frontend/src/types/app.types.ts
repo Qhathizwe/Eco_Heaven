@@ -27,7 +27,7 @@ export type new_accomodation = Omit<Accomodations, "id">;
 
 export interface Rooms {
   id: number;
-  accommodation_id: number;
+  accomodation_id: number;
   room_type: string;
   price_per_night: number | string;
   description: string;

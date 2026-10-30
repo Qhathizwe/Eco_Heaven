@@ -12,8 +12,8 @@ import Navbar from "../../components/navbar/Navbar";
 import styles from "./LandingPage.module.css";
 import hero from "../../assets/hero-image.jpg";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
+// const API_URL =
+//   import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("en-ZA", {
@@ -92,32 +92,32 @@ const LandingPage = () => {
     }
   }
 
-  async function getStartingPrice(id: number): Promise<number | null> {
-    try {
-      const response = await fetch(
-        `${API_URL}/accommodations/${id}/rooms`
-      );
-      if (!response.ok) return null;
+  // async function getStartingPrice (id: number): Promise<number | null> {
+  //   try {
+  //     const response = await fetch(
+  //       `${API_URL}/accommodations/${id}/rooms`
+  //     );
+  //     if (!response.ok) return null;
 
-      const result = await response.json();
-      const rooms = Array.isArray(result) ? result : result.data ?? [];
-      const available = rooms.filter(
-        (room: { is_available: boolean; price_per_night: number }) =>
-          room.is_available
-      );
+  //     const result = await response.json();
+  //     const rooms = Array.isArray(result) ? result : result.data ?? [];
+  //     const available = rooms.filter(
+  //       (room: { is_available: boolean; price_per_night: number }) =>
+  //         room.is_available
+  //     );
 
-      if (!available.length) return null;
+  //     if (!available.length) return null;
 
-      return Math.min(
-        ...available.map(
-          (room: { price_per_night: number }) =>
-            Number(room.price_per_night)
-        )
-      );
-    } catch {
-      return null;
-    }
-  }
+  //     return Math.min(
+  //       ...available.map(
+  //         (room: { price_per_night: number }) =>
+  //           Number(room.price_per_night)
+  //       )
+  //     );
+  //   } catch {
+  //     return null;
+  //   }
+  // }
 
   return (
     <div className={styles.page}>
