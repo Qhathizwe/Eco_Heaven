@@ -37,6 +37,8 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        localStorage.getItem("token")
 
         // 1. Pack global fields inside a base data tracker
         const formData = new FormData();
