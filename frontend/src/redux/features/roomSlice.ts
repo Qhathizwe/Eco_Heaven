@@ -2,8 +2,7 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Rooms } from "../../types/app.types";
 
-const API_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:7000/api";
+const API_URL ="https://eco-heaven.onrender.com/api"
 
 interface RoomState {
     roomList: Rooms[];
