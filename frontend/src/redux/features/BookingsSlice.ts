@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
+const API_URL ="https://eco-heaven.onrender.com/api"
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
 

@@ -1,8 +1,7 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const API_BASE =
-  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
+const API_URL ="https://eco-heaven.onrender.com/api"
 
 export interface UserProfile {
     id: number | string;
@@ -48,7 +47,7 @@ async function apiRequest<T>(
 ): Promise<T> {
     const token = getToken();
 
-    const response = await fetch(`${API_BASE}${endpoint}`, {
+    const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers: {
             "Content-Type": "application/json",

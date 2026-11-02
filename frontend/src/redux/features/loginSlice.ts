@@ -5,9 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import type {  User } from "../../types/app.types";
 
-const API_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:7000/api"
-).replace(/\/$/, "");
+const API_URL ="https://eco-heaven.onrender.com/api"
 
 interface LoginForm {
   email: string;
@@ -133,8 +131,8 @@ const loginSlice = createSlice({
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      localStorage.removeItem("Token");
-      localStorage.removeItem("Role");
+      // localStorage.removeItem("Token");
+      // localStorage.removeItem("Role");
     },
   },
 

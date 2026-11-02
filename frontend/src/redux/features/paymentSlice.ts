@@ -1,24 +1,27 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
 import type { Booking } from "./BookingsSlice";
- 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7000/api";
- 
+
+const API_URL ="https://eco-heaven.onrender.com/api"
+
 interface PaymentState {
   isInitializing: boolean;
   isVerifying: boolean;
   verifiedBooking: Booking | null;
   error: string | null;
 }
- 
+
 const initialState: PaymentState = {
   isInitializing: false,
   isVerifying: false,
   verifiedBooking: null,
   error: null,
 };
- 
-const getToken = () => localStorage.getItem("token");
- 
+
+const getToken = (): string | null => {
+  return localStorage.getItem("token");
+};
+
 export interface BookingDetailsPayload {
   accommodation_id: number;
   room_id: number;
@@ -26,120 +29,176 @@ export interface BookingDetailsPayload {
   check_out: string;
   guests: number;
 }
- 
-// 💳 Initialize Paystack checkout session
-// The server works out the price and uses the logged-in user's email, so only
-// the booking details are used. Both call styles work:
-//   initializePaymentThunk({ accommodation_id, room_id, ... })
-//   initializePaymentThunk({ email, amount, bookingDetails: { ... } })
-export const initializePaymentThunk = createAsyncThunk(
+
+/**
+ * Initialize online payment.
+ * The backend calculates the total amount
+ * using the actual room price in PostgreSQL.
+ */
+export const initializePaymentThunk = createAsyncThunk<
+  string,
+  BookingDetailsPayload,
+  { rejectValue: string }
+>(
   "payment/initialize",
-  async (
-    payload:
-      | BookingDetailsPayload
-      | { email?: string; amount?: number; bookingDetails: BookingDetailsPayload },
-    thunkAPI
-  ) => {
+  async (bookingDetails, thunkAPI) => {
     try {
       const token = getToken();
-      if (!token) throw new Error("Please sign in to continue.");
- 
-      const bookingDetails =
-        "bookingDetails" in payload ? payload.bookingDetails : payload;
- 
-      const response = await fetch(`${API_URL}/payments/initialize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ bookingDetails }),
-      });
- 
-      const data = await response.json().catch(() => ({}));
- 
-      if (!response.ok || !data.success || !data.data?.authorization_url) {
-        // e.g. 409 "this room is fully booked for the dates you selected"
-        return thunkAPI.rejectWithValue(data.message || "Failed to initialize checkout.");
+
+      if (!token) {
+        return thunkAPI.rejectWithValue(
+          "Please sign in before making a payment."
+        );
       }
- 
-      // Return the authorization url to handle the redirect
+
+      const response = await fetch(
+        `${API_URL}/payments/initialize`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bookingDetails,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        return thunkAPI.rejectWithValue(
+          data.message || "Unable to initialize payment."
+        );
+      }
+
+      if (!data.data?.authorization_url) {
+        return thunkAPI.rejectWithValue(
+          "Paystack did not return a checkout URL."
+        );
+      }
+
       return data.data.authorization_url as string;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || "Unable to connect to payment server.");
+    } catch (error: unknown) {
+      return thunkAPI.rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Unable to connect to the payment server."
+      );
     }
   }
 );
- 
-// 🔍 Verify Paystack transaction reference (creates the confirmed booking)
-export const verifyPaymentThunk = createAsyncThunk(
+
+/**
+ * Verify Paystack payment.
+ */
+export const verifyPaymentThunk = createAsyncThunk<
+  Booking,
+  string,
+  { rejectValue: string }
+>(
   "payment/verify",
-  async (reference: string, thunkAPI) => {
+  async (reference, thunkAPI) => {
     try {
       const token = getToken();
-      if (!token) throw new Error("Please sign in to continue.");
- 
+
+      if (!token) {
+        return thunkAPI.rejectWithValue(
+          "Please sign in to verify your payment."
+        );
+      }
+
       const response = await fetch(
         `${API_URL}/payments/verify/${encodeURIComponent(reference)}`,
         {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
- 
-      const data = await response.json().catch(() => ({}));
- 
+
+      const data = await response.json();
+
       if (!response.ok || !data.success) {
-        return thunkAPI.rejectWithValue(data.message || "Payment verification failed.");
+        return thunkAPI.rejectWithValue(
+          data.message || "Payment verification failed."
+        );
       }
- 
+
       return data.booking as Booking;
-    } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || "Could not verify payment.");
+    } catch (error: unknown) {
+      return thunkAPI.rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Unable to verify your payment."
+      );
     }
   }
 );
- 
+
 const paymentSlice = createSlice({
   name: "payment",
+
   initialState,
+
   reducers: {
     clearPaymentError(state) {
       state.error = null;
     },
+
+    clearVerifiedBooking(state) {
+      state.verifiedBooking = null;
+      state.error = null;
+    },
   },
+
   extraReducers: (builder) => {
     builder
-      // INITIALIZE
+
+      // INITIALIZE PAYMENT
+
       .addCase(initializePaymentThunk.pending, (state) => {
         state.isInitializing = true;
         state.error = null;
       })
+
       .addCase(initializePaymentThunk.fulfilled, (state) => {
         state.isInitializing = false;
+        state.error = null;
       })
+
       .addCase(initializePaymentThunk.rejected, (state, action) => {
         state.isInitializing = false;
-        state.error = action.payload as string;
+        state.error =
+          action.payload || "Payment initialization failed.";
       })
- 
-      // VERIFY
+
+      // VERIFY PAYMENT
+
       .addCase(verifyPaymentThunk.pending, (state) => {
         state.isVerifying = true;
         state.error = null;
       })
+
       .addCase(verifyPaymentThunk.fulfilled, (state, action) => {
         state.isVerifying = false;
         state.verifiedBooking = action.payload;
+        state.error = null;
       })
+
       .addCase(verifyPaymentThunk.rejected, (state, action) => {
         state.isVerifying = false;
-        state.error = action.payload as string;
+        state.error =
+          action.payload || "Payment verification failed.";
       });
   },
 });
- 
-export const { clearPaymentError } = paymentSlice.actions;
+
+export const {
+  clearPaymentError,
+  clearVerifiedBooking,
+} = paymentSlice.actions;
+
 export default paymentSlice.reducer;
- 

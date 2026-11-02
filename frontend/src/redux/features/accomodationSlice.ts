@@ -36,16 +36,24 @@ const initialState: AccomodationState = {
     isLoading: false,
     error: null,
 };
-
-const API_URL = "http://localhost:7000/api";
+const API_URL = "https://eco-heaven.onrender.com/api"
 
 // CREATE Accommodation
 export const addAccomodationThunk = createAsyncThunk(
     'accomodation/addAccomodation',
     async (accomodationData: FormData, thunkAPI) => {
         try {
-            const response = await fetch(API_URL + '/accommodation', {
-                method: 'POST',
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Please log in as an administrator.");
+            }
+
+            const response = await fetch(`${API_URL}/accommodations`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 body: accomodationData,
             });
 
@@ -83,12 +91,22 @@ export const updateAccomodationThunk = createAsyncThunk(
     'accomodation/updateAccomodation',
     async ({ id, formData }: { id: number | string; formData: FormData }, thunkAPI) => {
         try {
-            // FIX: Removed 'Content-Type' JSON headers to let the browser automatically handle multipart/form-data boundaries
-            const response = await fetch(`${API_URL}/accomodations/${id}`, {
-                method: 'PUT',
-                body: formData,
-            });
-            
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Please log in as an administrator.");
+            }
+
+            const response = await fetch(
+                `${API_URL}/accommodations/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                }
+            );
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Failed to update accommodation record');
@@ -105,9 +123,21 @@ export const deleteAccomodationThunk = createAsyncThunk(
     'accomodation/deleteAccomodation',
     async (id: number, thunkAPI) => {
         try {
-            const response = await fetch(`${API_URL}/accomodations/${id}`, {
-                method: 'DELETE',
-            });
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                throw new Error("Please log in as an administrator.");
+            }
+
+            const response = await fetch(
+                `${API_URL}/accommodations/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             if (!response.ok) throw new Error('Failed to delete accommodation');
             return id;
         } catch (error: any) {

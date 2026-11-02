@@ -33,7 +33,7 @@ const initialState: UserState = {
     error: null,
 };
 
-const API_URL = "http://localhost:7000/api";
+const API_URL ="https://eco-heaven.onrender.com/api"
 
 // CREATE Admin User Thunk
 export const createUserThunk = createAsyncThunk(
