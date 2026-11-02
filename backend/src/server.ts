@@ -47,28 +47,13 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 
 app.use("/api/users", userRouter);
-app.use("/api/accommodations", accomodationRouter); 
+app.use("/api/accommodations", accomodationRouter);
 app.use("/api", roomRouter);
 app.use("/api", bookingRouter);
 app.use("/api", reviewRouter);
 app.use("/api", favouriteRouter);
 app.use("/api/payments", paymentRouter);
 
-// app.use((_req, res) => {
-//   res.status(404).json({ message: "API endpoint not found." });
-
-
-app.use(
-  (
-    error: Error,
-    _req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction,
-  ) => {
-    console.error("Unhandled server error:", error);
-    res.status(500).json({ message: "An unexpected server error occurred." });
-  },
-);
 
 async function startServer(): Promise<void> {
   try {
@@ -81,9 +66,9 @@ async function startServer(): Promise<void> {
     await createReviewTable();
     await createFavouriteTable();
 
-    app.listen(PORT, () => {
-      console.log(`WildHaven API: http://localhost:${PORT}`);
-
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`WildHeaven listening on port ${PORT}`);
+      console.log("Database initialization completed.");
     });
   } catch (error) {
     console.error("WildHaven could not start:", error);
