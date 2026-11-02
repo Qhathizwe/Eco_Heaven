@@ -12,8 +12,7 @@ import Navbar from "../../components/navbar/Navbar";
 import styles from "./LandingPage.module.css";
 import hero from "../../assets/hero-image.jpg";
 
-// const API_URL =
-//   import.meta.env.VITE_API_URL || "http://localhost:7000/api";
+// const API_URL ="https://eco-heaven.onrender.com/api"
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("en-ZA", {
