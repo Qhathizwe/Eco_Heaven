@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/hooks';
+import React from 'react';
 import {
     updateAccomodationFormField,
     addAccomodationThunk,
-    resetAccomodationForm
+    updateAccomodationThunk,
+    resetAccomodationForm,
+    getAccomodationsThunk
 } from '../../../redux/features/accomodationSlice';
 import styles from './AddAccommodationModal.module.css';
 
@@ -14,11 +16,11 @@ interface ModalProps {
 
 export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useAppDispatch();
-    const { form, isLoading, error } = useAppSelector((state) => state.accomodation);
+    const { form, editingAccomodation, isLoading, error } = useAppSelector((state) => state.accomodation);
     
-    // FIX 1: Local state for files keeps Redux fully serializable 
-    // and eliminates all toolkit console warnings
-    const [localPictures, setLocalPictures] = useState<File[]>([]);
+    const [localPictures, setLocalPictures] = React.useState<File[]>([]);
+
+    const isEditMode = Boolean(editingAccomodation);
 
     if (!isOpen) return null;
 
@@ -30,17 +32,20 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
     };
 
     const handleClose = () => {
-        setLocalPictures([]); // Clear localized file states
-        dispatch(resetAccomodationForm()); // Clear form fields
-        onClose(); // Close the modal
+        setLocalPictures([]);
+        dispatch(resetAccomodationForm());
+        onClose();
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        localStorage.getItem("token")
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please log in as an administrator.");
+            return;
+        }
 
-        // 1. Pack global fields inside a base data tracker
         const formData = new FormData();
         formData.append('name', form.name);
         formData.append('description', form.description);
@@ -48,7 +53,6 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
         formData.append('star_rating', form.star_rating.toString());
         formData.append('province', form.province);
         
-        // Handle parsing comma-separated field text inputs safely into string arrays
         const amenitiesArray = typeof form.amenities === 'string' 
             ? (form.amenities as string).split(',').map(item => item.trim()) 
             : form.amenities;
@@ -60,22 +64,31 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
         formData.append('amenities', JSON.stringify(amenitiesArray));
         formData.append('rooms', JSON.stringify(roomsArray));
 
-        // FIX 2: Handle Backend single file expectations.
-        // If your backend relies on singular parsing (e.g. req.file), 
-        // we map individual attachments under the explicit singular key identifier name.
         if (localPictures.length > 0) {
             localPictures.forEach((file: File) => {
-                // Change 'pictures' to the exact singular field property key name your backend expects (e.g., 'picture' or 'image')
                 formData.append('pictures', file); 
             });
         }
 
-        // 3. Dispatch the payload through your Thunk middleware
-        const result = await dispatch(addAccomodationThunk(formData));
+        let result;
+        if (isEditMode && editingAccomodation) {
+            // Dispatch update thunk
+            result = await dispatch(updateAccomodationThunk({
+                id: editingAccomodation.id,
+                formData
+            }));
+        } else {
+            // Dispatch create thunk
+            result = await dispatch(addAccomodationThunk(formData));
+        }
 
-        if (addAccomodationThunk.fulfilled.match(result)) {
+        if (
+            (isEditMode && updateAccomodationThunk.fulfilled.match(result)) ||
+            (!isEditMode && addAccomodationThunk.fulfilled.match(result))
+        ) {
+            dispatch(getAccomodationsThunk());
             handleClose();
-            alert("Accommodation added successfully!");
+            alert(isEditMode ? "Accommodation updated successfully!" : "Accommodation added successfully!");
         }
     };
 
@@ -83,7 +96,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
                 <header className={styles.modalHeader}>
-                    <h2>Add New WildHeaven Accommodation</h2>
+                    <h2>{isEditMode ? "Edit Accommodation Profile" : "Add New WildHeaven Accommodation"}</h2>
                     <button className={styles.closeBtn} onClick={handleClose}>&times;</button>
                 </header>
 
@@ -143,7 +156,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
 
                         <div className={styles.inputGroup}>
                             <label>Province</label>
-                            <select name="province" value={form.province} onChange={handleInputChange}>
+                            <select name="province" value={form.province} onChange={handleInputChange} required>
                                 <option value="">Select Province</option>
                                 <option value="Gauteng">Gauteng</option>
                                 <option value="Western Cape">Western Cape</option>
@@ -156,6 +169,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                             </select>
                         </div>
                     </div>
+
                     <div className={styles.inputGroup}>
                         <label>Amenities (Comma Separated)</label>
                         <input
@@ -166,6 +180,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                             placeholder="wifi, pool, spa, gym"
                         />
                     </div>
+
                     <div className={styles.inputGroup}>
                         <label>Rooms (Comma Separated)</label>
                         <input
@@ -176,8 +191,9 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                             placeholder="Standard, Deluxe, Suite"
                         />
                     </div>
+
                     <div className={styles.inputGroup}>
-                        <label>Photo Gallery</label>
+                        <label>Photo Gallery {isEditMode && "(Existing images will be kept)"}</label>
                         <input
                             type="file"
                             multiple
@@ -186,13 +202,11 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                             onChange={(e) => {
                                 if (e.target.files) {
                                     const newFiles = Array.from(e.target.files);
-                                    // Save state updates locally to isolate serialization layer
                                     setLocalPictures((prev) => [...prev, ...newFiles]);
                                 }
                             }}
                         />
 
-                        {/* Image Gallery Preview Grid UI rendering */}
                         {localPictures.length > 0 && (
                             <div className={styles.previewGrid}>
                                 {localPictures.map((file, index) => (
@@ -216,7 +230,7 @@ export const AddAccommodationModal: React.FC<ModalProps> = ({ isOpen, onClose })
                     </div>
                     
                     <button type="submit" disabled={isLoading} className={styles.submitBtn}>
-                        {isLoading ? 'Saving...' : 'Add Accommodation'}
+                        {isLoading ? 'Saving...' : (isEditMode ? 'Update Accommodation' : 'Add Accommodation')}
                     </button>
                 </form>
             </div>
