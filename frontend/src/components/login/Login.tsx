@@ -7,10 +7,18 @@ import {
 } from "../../redux/features/loginSlice";
 import styles from "./Login.module.css";
 
+
+const API_URL = "http://localhost:7000/api";
+
 export default function Login() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { form, isLoading, error } = useAppSelector((state) => state.login);
+
+  const handleGoogleLogin = () => {
+    // Directly point the browser window to your backend endpoint
+    window.location.href = `${API_URL}/auth/google`;
+  };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,6 +89,11 @@ export default function Login() {
             {isLoading ? "Signing you in…" : "Sign in"}
           </button>
         </form>
+
+        {/* 🌟 Cleaned up: Removed stray return wrapper statement */}
+        <button onClick={handleGoogleLogin} className={styles.googleBtn || "google-btn"}>
+          Sign in with Google
+        </button>
 
         <p className={styles.footerText}>
           New to WildHaven? <Link to="/register">Create an account</Link>

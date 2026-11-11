@@ -1,7 +1,16 @@
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import dotenv from 'dotenv';
+
+// 🌟 Import the base module cleanly
+const multerStorageCloudinary = require('multer-storage-cloudinary');
+
+// 🛠️ Robust extraction: finds the class whether it's named, default-nested, or raw
+const CloudinaryStorageClass = 
+    multerStorageCloudinary.CloudinaryStorage || 
+    multerStorageCloudinary.default?.CloudinaryStorage || 
+    multerStorageCloudinary.default ||
+    multerStorageCloudinary;
 
 dotenv.config();
 
@@ -13,7 +22,7 @@ cloudinary.config({
 });
 
 // Configure the Multer Storage Engine parameters to connect with Cloudinary
-const storage = new CloudinaryStorage({
+const storage = new CloudinaryStorageClass({
     cloudinary: cloudinary,
     params: {
         // This folder will be automatically created inside your Cloudinary Media Library

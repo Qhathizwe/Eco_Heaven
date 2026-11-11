@@ -9,7 +9,7 @@ export async function createUserController(
   res: Response,
 ): Promise<void> {
   try {
-    const { name, surname, email, password, phone } = req.body;
+    const { name, surname, email, password, phone, role } = req.body;
 
     if (![name, surname, email, password, phone].every(
       (value) => typeof value === "string" && value.trim().length > 0,
@@ -32,6 +32,13 @@ export async function createUserController(
       return;
     }
 
+    //  Validate role if it's provided, otherwise default to "user"
+    const assignedRole = role ? role : "user";
+    if (assignedRole !== "admin" && assignedRole !== "user") {
+      res.status(400).json({ message: "Role must be admin or user." });
+      return;
+    }
+
     const existingUser = await userServices.findUserByEmail(email);
 
     if (existingUser) {
@@ -45,7 +52,7 @@ export async function createUserController(
       email,
       password,
       phone,
-      role: "user",
+      role: assignedRole,
     });
 
     res.status(201).json({

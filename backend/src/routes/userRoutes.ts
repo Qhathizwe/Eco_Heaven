@@ -31,6 +31,7 @@ router.patch("/me", protect, updateOwnProfileController);
 router.patch("/change-password", protect, changeOwnPasswordController);
 
 // Administrator-only user management
+router.post("/admin/register", protect, requireAdmin, createUserController);
 router.get("/", protect, requireAdmin, getAllUsers);
 router.get("/role/:role", protect, requireAdmin, getUsersByRole);
 router.get("/:id", protect, requireAdmin, getUserById);

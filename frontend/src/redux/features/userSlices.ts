@@ -25,7 +25,7 @@ const initialState: UserState = {
         email: "",
         password: "",
         phone: "",
-        role: "admin", // Defaults creation to admin as requested
+        role: "admin",
     },
     editingUser: null,
     isSuccess: false,
@@ -33,14 +33,14 @@ const initialState: UserState = {
     error: null,
 };
 
-const API_URL ="https://eco-heaven.onrender.com/api"
+const API_URL = "https://eco-heaven.onrender.com/api";
 
-// CREATE Admin User Thunk
+// 1. CREATE Public User Thunk
 export const createUserThunk = createAsyncThunk(
     'user/createUser',
     async (userData: any, thunkAPI) => {
         try {
-            const response = await fetch(API_URL + '/auth/register', {
+            const response = await fetch(API_URL + '/users/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -57,14 +57,46 @@ export const createUserThunk = createAsyncThunk(
     }
 );
 
-// READ All Users Thunk
+// 2. CREATE Admin Thunk (Protected)
+export const createAdminThunk = createAsyncThunk(
+    'user/createAdmin',
+    async (adminData: any, thunkAPI) => {
+        try {
+            const token = localStorage.getItem("token"); 
+
+            const response = await fetch(API_URL + '/users/admin/register', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(adminData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to create admin account');
+            }
+            return await response.json();
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
+
+// 3. READ All Users Thunk (Protected)
 export const getUsersThunk = createAsyncThunk(
     'user/getUsers',
     async (_, thunkAPI) => {
         try {
+            const token = localStorage.getItem("token");
+
             const response = await fetch(API_URL + '/users', {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
             if (!response.ok) throw new Error('Failed to fetch user directory');
             return await response.json();
@@ -74,14 +106,19 @@ export const getUsersThunk = createAsyncThunk(
     }
 );
 
-// UPDATE User Thunk
+// 4. UPDATE User Thunk (Protected)
 export const updateUserThunk = createAsyncThunk(
     'user/updateUser',
     async ({ id, userData }: { id: number | string; userData: any }, thunkAPI) => {
         try {
+            const token = localStorage.getItem("token");
+
             const response = await fetch(`${API_URL}/users/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(userData),
             });
             
@@ -96,13 +133,18 @@ export const updateUserThunk = createAsyncThunk(
     }
 );
 
-// DELETE User Thunk
+// 5. DELETE User Thunk (Protected)
 export const deleteUserThunk = createAsyncThunk(
     'user/deleteUser',
     async (id: number, thunkAPI) => {
         try {
+            const token = localStorage.getItem("token");
+
             const response = await fetch(`${API_URL}/users/${id}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
             if (!response.ok) throw new Error('Failed to delete user profile');
             return id;
@@ -130,7 +172,7 @@ const userSlice = createSlice({
                     name: action.payload.name || "",
                     surname: action.payload.surname || "",
                     email: action.payload.email || "",
-                    password: "", // Leave blank on edit for security
+                    password: "", 
                     phone: action.payload.phone || "",
                     role: action.payload.role || "user"
                 };
@@ -149,7 +191,7 @@ const userSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // CREATE USER
+            // CREATE USER (Public)
             .addCase(createUserThunk.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
@@ -164,10 +206,28 @@ const userSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
             })
+
+            // CREATE ADMIN
+            .addCase(createAdminThunk.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(createAdminThunk.fulfilled, (state, action: PayloadAction<any>) => {
+                const cleanItem = action.payload.user || action.payload;
+                state.userList.push(cleanItem);
+                state.isSuccess = true;
+                state.isLoading = false;
+            })
+            .addCase(createAdminThunk.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
+
             // READ USERS
             .addCase(getUsersThunk.fulfilled, (state, action: PayloadAction<User[]>) => {
                 state.userList = action.payload;
             })
+
             // UPDATE USER
             .addCase(updateUserThunk.pending, (state) => {
                 state.isLoading = true;
@@ -188,6 +248,7 @@ const userSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload as string;
             })
+
             // DELETE USER
             .addCase(deleteUserThunk.fulfilled, (state, action: PayloadAction<number>) => {
                 state.userList = state.userList.filter(item => item.id !== action.payload);

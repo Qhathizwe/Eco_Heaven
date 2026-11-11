@@ -4,6 +4,7 @@ import LandingPage from "./pages/landingPage/LandingPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import LoginPage from "./pages/login/LoginPage";
 import AccommodationDetails from "./pages/accomodation/AccomodationDetails";
+import OAuthSuccess from "./pages/OAuth_Success/Oauth_Success";
 
 import AdminDashboard from "./pages/dashboards/admin/AdminDashBoard";
 import UserDashboard from "./pages/dashboards/user/UserDashboard";
@@ -24,6 +25,7 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/oauth-success" element={<OAuthSuccess />} />
 
       <Route path="/stays" element={<LandingPage />} />
       <Route path="/stays/:id" element={<AccommodationDetails  />} />

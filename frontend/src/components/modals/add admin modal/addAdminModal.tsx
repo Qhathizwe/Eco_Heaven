@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {type  AppDispatch, type RootState } from "../../../store";
 import { 
     updateUserFormField, 
-    createUserThunk, 
+    createAdminThunk, 
     resetUserForm, 
     getUsersThunk 
 } from "../../../redux/features/userSlices";
@@ -24,15 +24,20 @@ export const AddAdminModal: React.FC<AddAdminModalProps> = ({ isOpen, onClose })
         dispatch(updateUserFormField({ field: name as any, value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const resultAction = await dispatch(createUserThunk(form));
-        if (createUserThunk.fulfilled.match(resultAction)) {
-            dispatch(getUsersThunk());
-            dispatch(resetUserForm());
-            onClose();
-        }
-    };
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const resultAction = await dispatch(createAdminThunk({
+        ...form,
+        role: "admin" 
+    }));
+
+    if (createAdminThunk.fulfilled.match(resultAction)) {
+        dispatch(getUsersThunk());
+        dispatch(resetUserForm());
+        onClose();
+    }
+};
 
     return (
         <div style={{
