@@ -1,9 +1,10 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {type  AppDispatch, type RootState } from "../../../store";
+import { type AppDispatch, type RootState } from "../../../store";
 import { 
     updateUserFormField, 
     createAdminThunk, 
+    updateUserThunk, 
     resetUserForm, 
     getUsersThunk 
 } from "../../../redux/features/userSlices";
@@ -15,29 +16,46 @@ interface AddAdminModalProps {
 
 export const AddAdminModal: React.FC<AddAdminModalProps> = ({ isOpen, onClose }) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { form, isLoading, error } = useSelector((state: RootState) => state.user);
+    const { form, editingUser, isLoading, error } = useSelector((state: RootState) => state.user);
 
     if (!isOpen) return null;
+
+    const isEditMode = Boolean(editingUser);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         dispatch(updateUserFormField({ field: name as any, value }));
     };
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const resultAction = await dispatch(createAdminThunk({
-        ...form,
-        role: "admin" 
-    }));
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        let resultAction;
 
-    if (createAdminThunk.fulfilled.match(resultAction)) {
-        dispatch(getUsersThunk());
-        dispatch(resetUserForm());
-        onClose();
-    }
-};
+        if (isEditMode && editingUser) {
+            // Dispatch update thunk if we are editing an existing user
+            resultAction = await dispatch(updateUserThunk({
+                id: editingUser.id,
+                userData: form
+            }));
+        } else {
+            // Dispatch create admin thunk if we are registering a new admin
+            resultAction = await dispatch(createAdminThunk({
+                ...form,
+                role: "admin"
+            }));
+        }
+
+        // Check if the appropriate action succeeded
+        if (
+            (isEditMode && updateUserThunk.fulfilled.match(resultAction)) ||
+            (!isEditMode && createAdminThunk.fulfilled.match(resultAction))
+        ) {
+            dispatch(getUsersThunk());
+            dispatch(resetUserForm());
+            onClose();
+        }
+    };
 
     return (
         <div style={{
@@ -52,7 +70,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                     <h2 style={{ fontFamily: "Georgia, serif", fontSize: "1.6rem", margin: 0, color: "#244d3a" }}>
-                        Register New Admin
+                        {isEditMode ? "Edit User Profile" : "Register New Admin"}
                     </h2>
                     <button 
                         onClick={() => { dispatch(resetUserForm()); onClose(); }}
@@ -63,7 +81,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
 
                 <p style={{ color: "#858b81", fontSize: "0.9rem", marginTop: 0, marginBottom: "20px" }}>
-                    Create an administrative security profile with elevated system management permissions.
+                    {isEditMode 
+                        ? "Modify user account information and system permissions." 
+                        : "Create an administrative security profile with elevated system management permissions."}
                 </p>
 
                 {error && (
@@ -100,9 +120,16 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                         <div>
-                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "5px", color: "#244d3a" }}>PASSWORD</label>
+                            <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "5px", color: "#244d3a" }}>
+                                {isEditMode ? "NEW PASSWORD (OPTIONAL)" : "PASSWORD"}
+                            </label>
                             <input 
-                                type="password" name="password" value={form.password} onChange={handleChange} required 
+                                type="password" 
+                                name="password" 
+                                value={form.password} 
+                                onChange={handleChange} 
+                                required={!isEditMode} 
+                                placeholder={isEditMode ? "Leave blank to keep current" : ""}
                                 style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #dce2d8", background: "#fff", outline: "none" }}
                             />
                         </div>
@@ -118,10 +145,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <div>
                         <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "5px", color: "#244d3a" }}>SYSTEM ACCESS ROLE</label>
                         <select 
-                            name="role" value={form.role} onChange={handleChange}
+                            name="role" 
+                            value={form.role} 
+                            onChange={handleChange}
                             style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #dce2d8", background: "#fff", outline: "none" }}
                         >
                             <option value="admin">Administrator</option>
+                            <option value="user">User</option>
                         </select>
                     </div>
 
@@ -138,7 +168,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                             disabled={isLoading}
                             style={{ padding: "10px 22px", background: "#244d3a", color: "#e9e395", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: 700 }}
                         >
-                            {isLoading ? "Provisioning..." : "Create Admin Account"}
+                            {isLoading 
+                                ? (isEditMode ? "Saving..." : "Provisioning...") 
+                                : (isEditMode ? "Save Changes" : "Create Admin Account")}
                         </button>
                     </div>
                 </form>
