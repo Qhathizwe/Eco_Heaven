@@ -1,7 +1,8 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-const API_URL ="https://eco-heaven.onrender.com/api"
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 export interface UserProfile {
     id: number | string;
@@ -128,7 +129,7 @@ export const updateProfileThunk = createAsyncThunk<
     { rejectValue: string }
 >("profile/updateProfile", async (profileData, { rejectWithValue }) => {
     try {
-        const data = await apiRequest<unknown>("/users/profile", {
+        const data = await apiRequest<unknown>("/users/me", {
             method: "PATCH",
             body: JSON.stringify({
                 name: profileData.first_name,

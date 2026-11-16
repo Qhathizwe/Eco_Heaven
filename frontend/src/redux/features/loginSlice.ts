@@ -5,7 +5,8 @@ import {
 } from "@reduxjs/toolkit";
 import type { User } from "../../types/app.types";
 
-const API_URL = "https://eco-heaven.onrender.com/api";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 interface LoginForm {
   email: string;
@@ -74,44 +75,54 @@ export const loginUserThunk = createAsyncThunk<
   }
 });
 
-// 🌟 New: Google OAuth Profile Hydration Thunk
+//  Google OAuth Profile Thunk
 export const handleGoogleOAuthLogin = createAsyncThunk<
   { token: string; user: User },
   string,
   { rejectValue: string }
->("auth/googleOAuthLogin", async (token, thunkAPI) => {
-  try {
-    // Save token immediately so any subsequent hooks or interceptors find it
-    localStorage.setItem("token", token);
+>(
+  "auth/googleOAuthLogin",
+  async (token, thunkAPI) => {
+    try {
+      const response = await fetch(`${API_URL}/users/profile`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-    // Call your profile hydration endpoint to fetch the user object matching this token
-    const response = await fetch(`${API_URL}/users/me`, {
-      method: "GET",
-      headers: { 
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-    });
+      const data = await response.json();
 
-    const data = await response.json();
+      if (!response.ok || !data.user) {
+        throw new Error(
+          data.message || "Unable to retrieve your Google account.",
+        );
+      }
 
-    if (!response.ok || !data.user) {
-      throw new Error(data.message || "Failed to retrieve user profile after social sign-in.");
+      if (!data.user.id || !data.user.role) {
+        throw new Error("Your account information is incomplete.");
+      }
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      return {
+        token,
+        user: data.user as User,
+      };
+    } catch (error) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      return thunkAPI.rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Google sign-in could not be completed.",
+      );
     }
-
-    // Save full user block to persistence layer
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    return { token, user: data.user as User };
-  } catch (error: any) {
-    // If profile fetching fails, clean up the orphaned token
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    return thunkAPI.rejectWithValue(
-      error.message || "Could not successfully complete profile sync from Google."
-    );
-  }
-});
+  },
+);
 
 export const restoreSession = createAsyncThunk(
   "auth/restoreSession",

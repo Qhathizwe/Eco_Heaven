@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Accomodations } from "../../types/app.types";
 
-const API_URL ="https://eco-heaven.onrender.com/api"
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 const getToken = () => localStorage.getItem("token");
 
