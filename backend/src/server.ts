@@ -11,6 +11,7 @@ import { createUserTable } from "./services/userServices";
 import { createAccomodationTable } from "./services/accomodationServices";
 import { createRoomsTable } from "./services/roomServices";
 import { createBookingTable } from "./services/bookingServices";
+import { createNotificationTable } from "./services/notificationServices";
 
 import userRouter from "./routes/userRoutes";
 import accomodationRouter from "./routes/accomodationsRoutes";
@@ -22,66 +23,42 @@ import { createReviewTable } from "./services/reviewServices";
 import { createFavouriteTable } from "./services/favouriteServices";
 import paymentRouter from "./routes/paymentRoutes";
 import OAuthRouter from './routes/authRoutes'
+import notificationRouter from "./routes/notificationRoutes";
+import contactRouter from "./routes/contactRoutes";
+
 
 const app = express();
-const PORT = Number(process.env.PORT || 7000);
 
-const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+const allowedOrigins = (
+  process.env.FRONTEND_URL ||
+  "http://localhost:5173,https://eco-heaven.vercel.app"
+)
   .split(",")
-  .map((origin) => origin.trim());
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      // Allow requests without Origin for tools such as Thunder Client.
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Origin is not allowed by CORS."));
-      }
-    },
-    credentials: true,
-  }),
-);
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests without an Origin header, such as server-to-server requests.
+    if (!origin) {
+      return callback(null, true);
+    }
 
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+    const normalizedOrigin = origin.replace(/\/+$/, "");
 
-// 🌟 Add passport initialization so your strategy engine is active
-app.use(passport.initialize());
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
 
-app.use("/api/users", userRouter);
-app.use("/api/accommodations", accomodationRouter);
-app.use("/api", roomRouter);
-app.use("/api", bookingRouter);
-app.use("/api", reviewRouter);
-app.use("/api", favouriteRouter);
-app.use("/api/payments", paymentRouter);
-app.use("/api/auth", OAuthRouter);
+    console.error("CORS rejected origin:", origin);
 
+    return callback(
+      new Error(`Origin ${origin} is not allowed by CORS`),
+    );
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-async function startServer(): Promise<void> {
-  try {
-    await DBConnection();
-    initializePassportStrategies(); 
-
-    await createUserTable();
-    await createAccomodationTable();
-    await createRoomsTable();
-    await createBookingTable();
-    await createReviewTable();
-    await createFavouriteTable();
-
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`WildHeaven listening on port ${PORT}`);
-      console.log("Database initialization completed.");
-    });
-  } catch (error) {
-    console.error("WildHaven could not start:", error);
-    await pool.end();
-    process.exit(1);
-  }
-}
-
-void startServer();
+app.use(cors(corsOptions));

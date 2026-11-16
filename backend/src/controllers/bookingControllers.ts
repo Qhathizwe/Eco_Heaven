@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import * as bookingServices from "../services/bookingServices";
+import { createNotification } from "../services/notificationServices";
 
 function isValidDateString(value: unknown): value is string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -77,6 +78,20 @@ export async function createBookingController(
       return;
     }
 
+    try {
+      await createNotification({
+        user_id: Number(userId),
+        title: "Reservation received",
+        message: `Your reservation #${booking.id} has been recorded. Payment is outstanding and will be settled at the property.`,
+        type: "booking",
+        link: `/payment-success?booking=${booking.id}`,
+      });
+    } catch (notificationError) {
+      console.error(
+        "Could not create booking notification:",
+        notificationError,
+      );
+    }
     res.status(201).json({
       message: "Your booking request has been submitted for confirmation.",
       booking,
@@ -162,11 +177,27 @@ export const updateBookingStatusController = async (
         message: "Booking not found.",
       });
     }
+    try {
+      await createNotification({
+        user_id: Number(booking.user_id),
+        title: "Booking status updated",
+        message: `Your booking #${booking.id} is now ${status}.`,
+        type: "booking",
+        link: "/my-bookings",
+      });
+    } catch (notificationError) {
+      console.error(
+        "Could not create booking status notification:",
+        notificationError,
+      );
+    }
 
     return res.status(200).json({
       message: "Booking status updated successfully.",
       booking,
     });
+
+
   } catch (error) {
     console.error("Update booking status error:", error);
 
@@ -175,3 +206,53 @@ export const updateBookingStatusController = async (
     });
   }
 };
+
+export async function getBookingByIdController(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const bookingId = Number(req.params.id);
+    const userId = Number(req.tokenData?.userId);
+    const isAdmin = req.tokenData?.role === "admin";
+
+    if (
+      !Number.isInteger(bookingId) ||
+      bookingId < 1 ||
+      !Number.isInteger(userId) ||
+      userId < 1
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid booking request.",
+      });
+      return;
+    }
+
+    const booking = await bookingServices.getBookingDetailsById(
+      bookingId,
+      userId,
+      isAdmin,
+    );
+
+    if (!booking) {
+      res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      booking,
+    });
+  } catch (error) {
+    console.error("Get booking details error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to retrieve booking details.",
+    });
+  }
+}

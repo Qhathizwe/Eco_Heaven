@@ -1,0 +1,82 @@
+.appShell {
+  min-height: 100vh;
+}
+
+.pageContainer {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.pageTitle {
+  color: var(--wh-forest-dark);
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 500;
+}
+
+.mutedText {
+  color: var(--wh-muted);
+}
+
+.surface {
+  border: 1px solid var(--wh-line);
+  border-radius: 15px;
+  background: var(--wh-paper);
+  box-shadow: 0 8px 26px rgba(35, 56, 39, 0.035);
+}
+
+.primaryAction {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--wh-forest);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.primaryAction:hover {
+  transform: translateY(-1px);
+  background: var(--wh-forest-dark);
+}
+
+.secondaryAction {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 17px;
+  border: 1px solid var(--wh-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--wh-forest);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.formError {
+  padding: 12px 14px;
+  border: 1px solid #f0d7d2;
+  border-radius: 8px;
+  background: #fff2ef;
+  color: var(--wh-danger);
+  font-size: 12px;
+}
+
+.formSuccess {
+  padding: 12px 14px;
+  border: 1px solid #d7e9d5;
+  border-radius: 8px;
+  background: #eff7ee;
+  color: var(--wh-success);
+  font-size: 12px;
+}

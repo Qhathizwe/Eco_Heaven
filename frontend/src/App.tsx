@@ -9,7 +9,7 @@ import OAuthSuccess from "./pages/OAuth_Success/Oauth_Success";
 import AdminDashboard from "./pages/dashboards/admin/AdminDashBoard";
 import UserDashboard from "./pages/dashboards/user/UserDashboard";
 import MyBookings from "./pages/dashboards/user/MyBookings";
-import ProfilePage from './pages/profile/Profile'
+import ProfilePage from "./pages/profile/Profile";
 import BookingSuccess from "./pages/bookings/BookingSuccess";
 
 import ManageAccomodations from "./pages/dashboards/admin/manage_admin/ManageAccomodations";
@@ -17,26 +17,37 @@ import ManageRooms from "./pages/dashboards/admin/manage_admin/ManageRooms";
 import ManageBookings from "./pages/dashboards/admin/manage_admin/ManageBookings";
 import ManageUsers from "./pages/dashboards/admin/manage_admin/ManageUsers";
 
+import About from "./pages/about/About";
+import Contact from "./pages/contact/Contact";
+
 import "./App.css";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/oauth-success" element={<OAuthSuccess />} />
 
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+
       <Route path="/stays" element={<LandingPage />} />
-      <Route path="/stays/:id" element={<AccommodationDetails  />} />
+      <Route path="/stays/:id" element={<AccommodationDetails />} />
 
       <Route path="/home" element={<UserDashboard />} />
       <Route path="/my-bookings" element={<MyBookings />} />
       <Route path="/users/profile" element={<ProfilePage />} />
-      <Route path="/payment-success" element={<BookingSuccess/>} />
+
+      <Route path="/payment-success" element={<BookingSuccess />} />
 
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/accommodations" element={<ManageAccomodations />} />
+      <Route
+        path="/admin/accommodations"
+        element={<ManageAccomodations />}
+      />
       <Route path="/admin/rooms" element={<ManageRooms />} />
       <Route path="/admin/bookings" element={<ManageBookings />} />
       <Route path="/admin/users" element={<ManageUsers />} />

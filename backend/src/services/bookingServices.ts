@@ -177,3 +177,47 @@ export const updateBookingStatus = async (
 
   return result.rows[0] ?? null;
 };
+
+export async function getBookingDetailsById(
+  bookingId: number,
+  userId: number,
+  isAdmin: boolean,
+) {
+  const result = await query(
+    `
+      SELECT
+        b.id,
+        b.user_id,
+        b.accommodation_id,
+        b.room_id,
+        b.check_in,
+        b.check_out,
+        b.guests,
+        b.status,
+        b.created_at,
+        b.payment_reference,
+        a.name AS accommodation_name,
+        a.address AS accommodation_address,
+        a.pictures AS accommodation_pictures,
+        a.province AS accommodation_province,
+        a.star_rating AS accommodation_star_rating,
+        r.room_type,
+        r.description AS room_description,
+        r.pictures AS room_pictures,
+        r.price_per_night,
+        u.name AS customer_name,
+        u.surname AS customer_surname,
+        u.email AS customer_email
+      FROM bookings b
+      JOIN accomodations a ON a.id = b.accommodation_id
+      JOIN rooms r ON r.id = b.room_id
+      JOIN users u ON u.id = b.user_id
+      WHERE b.id = $1
+        AND ($2::boolean = TRUE OR b.user_id = $3)
+      LIMIT 1
+    `,
+    [bookingId, isAdmin, userId],
+  );
+
+  return result.rows[0] ?? null;
+}

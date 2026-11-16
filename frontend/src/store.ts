@@ -10,6 +10,7 @@ import profileSlice from './redux/features/profileSlice'
 import reviewSlice from './redux/features/reviewSlice'
 import favouriteSlice from './redux/features/favouriteSlice'
 import paymentSlice from './redux/features/paymentSlice'
+import notificationSlice from "./redux/features/notificationSlice";
 
 
 export const store = configureStore({
@@ -23,7 +24,8 @@ export const store = configureStore({
     profile: profileSlice,
     review: reviewSlice,
     favourite: favouriteSlice,
-    payment: paymentSlice
+    payment: paymentSlice,
+    notifications: notificationSlice,
 
   },
 });

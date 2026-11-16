@@ -1,7 +1,8 @@
 import type { Request, Response } from "express";
 
 import * as paymentService from "../services/paymentServices";
-import * as bookingServices from "../services/bookingServices";
+import * as bookingServices from "../services/bookingServices"
+import { createNotification } from "../services/notificationServices";;
 
 import { query } from "../config/database";
 
@@ -22,10 +23,10 @@ export const initializePaymentController = async (
       return;
     }
 
-  // 2. Receive booking details from frontend
-const { 
-  bookingDetails: { accommodation_id, room_id, guests, check_in, check_out } = {} 
-} = req.body;
+    // 2. Receive booking details from frontend
+    const {
+      bookingDetails: { accommodation_id, room_id, guests, check_in, check_out } = {}
+    } = req.body;
 
     const accommodationId = Number(accommodation_id);
     const roomId = Number(room_id);
@@ -79,7 +80,7 @@ const {
 
     const nights = Math.round(
       (checkOutDate.getTime() - checkInDate.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     );
 
     if (
@@ -395,6 +396,23 @@ export const verifyPaymentController = async (
       `,
       [updateResult.rows[0].id, userId]
     );
+
+    try {
+      const confirmedBooking = fullDetailsResult.rows[0];
+
+      await createNotification({
+        user_id: userId,
+        title: "Your booking is confirmed!",
+        message: `Payment received. Your room at ${confirmedBooking.accommodation_name} is confirmed for ${confirmedBooking.check_in} to ${confirmedBooking.check_out}. Booking #${confirmedBooking.id}.`,
+        type: "booking",
+        link: "/my-bookings",
+      });
+    } catch (notificationError) {
+      console.error(
+        "Could not create payment confirmation notification:",
+        notificationError,
+      );
+    }
 
     res.status(200).json({
       success: true,
