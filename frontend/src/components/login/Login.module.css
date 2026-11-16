@@ -144,3 +144,42 @@
   font-size: 0.86rem;
   text-align: center;
 }
+.googleBtn {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #d9ded8;
+  border-radius: 12px;
+  background: #fff;
+  color: #26382d;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.googleBtn:hover {
+  background: #f7f9f6;
+  border-color: #9eafa1;
+  box-shadow: 0 5px 18px rgba(28, 57, 39, 0.09);
+  transform: translateY(-1px);
+}
+
+.googleBtn:focus-visible {
+  outline: 3px solid rgba(54, 112, 76, 0.25);
+  outline-offset: 3px;
+}
+
+.googleIcon {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+}

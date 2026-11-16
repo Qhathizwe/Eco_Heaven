@@ -7,8 +7,8 @@ import {
 } from "../../redux/features/loginSlice";
 import styles from "./Login.module.css";
 
-
-const API_URL = "http://localhost:7000/api";
+const API_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:7000/api";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -90,9 +90,35 @@ export default function Login() {
           </button>
         </form>
 
-        {/* 🌟 Cleaned up: Removed stray return wrapper statement */}
-        <button onClick={handleGoogleLogin} className={styles.googleBtn || "google-btn"}>
-          Sign in with Google
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className={styles.googleBtn}
+        >
+          <svg
+            className={styles.googleIcon}
+            viewBox="0 0 48 48"
+            aria-hidden="true"
+          >
+            <path
+              fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+              transform="translate(0 4)"
+            />
+            <path
+              fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.47-4.73 7.16l7.64 5.92c4.46-4.12 7.13-10.2 7.13-17.55Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M10.53 28.59a14.4 14.4 0 0 1 0-9.18l-7.98-6.19a24 24 0 0 0 0 21.56l7.98-6.19Z"
+            />
+            <path
+              fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.9-5.8l-7.64-5.92c-2.12 1.42-4.84 2.26-8.26 2.26-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+            />
+          </svg>
+          Continue with Google
         </button>
 
         <p className={styles.footerText}>

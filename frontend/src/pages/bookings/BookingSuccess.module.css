@@ -1,156 +1,474 @@
 .page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: #fcfbf9;
-  color: #1a1a1a;
+  background: #f6f7f2;
+  color: #26372b;
 }
 
-.container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
+.main {
+  width: min(100% - 36px, 900px);
+  margin: 0 auto;
+  padding: 48px 0 70px;
 }
 
-.card {
-  background: #ffffff;
-  border: 1px solid #e6e4df;
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 600px;
-  width: 100%;
+.center {
+  min-height: 75vh;
+  display: grid;
+  place-items: center;
+  padding: 30px 18px;
+}
+
+.hero {
+  max-width: 680px;
+  margin: 0 auto 34px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
 }
 
-.loader {
-  width: 40px;
-  height: 40px;
-  border: 3px solid #e6e4df;
-  border-top-color: #1a1a1a;
+.successIcon,
+.errorIcon {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 22px;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.successIcon, .errorIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  margin: 0 auto 20px;
+  font-size: 34px;
+  font-weight: 700;
 }
 
 .successIcon {
-  background: #eef6ed;
-  color: #2e7d32;
+  background: #e4f0e3;
+  color: #327244;
 }
 
 .errorIcon {
-  background: #fde8e8;
-  color: #c62828;
+  background: #fae9e5;
+  color: #b64e3d;
 }
 
 .eyebrow {
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  font-weight: 700;
-  color: #666;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 8px;
+  margin: 0 0 10px;
+  color: #71816f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
 
-.card h1 {
-  font-size: 28px;
-  margin-bottom: 12px;
+.hero h1,
+.loadingCard h1,
+.errorCard h1 {
+  margin: 0;
+  color: #233b2c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 5vw, 43px);
+  font-weight: 500;
+  line-height: 1.15;
 }
 
-.card h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-
-.subText {
-  color: #666;
+.subtitle {
+  max-width: 570px;
+  margin: 14px auto 18px;
+  color: #748075;
   font-size: 14px;
-  margin-bottom: 30px;
-  line-height: 1.5;
+  line-height: 1.7;
 }
 
-.receiptBox {
-  background: #f9f8f6;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: left;
-  margin-bottom: 30px;
-}
-
-.receiptRow {
+.statusPill {
+  width: fit-content;
   display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+  padding: 9px 14px;
+  border-radius: 40px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.statusPill span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.paid {
+  background: #e6f2e6;
+  color: #347044;
+}
+
+.paid span {
+  background: #39864c;
+}
+
+.pending {
+  background: #fff2dc;
+  color: #946522;
+}
+
+.pending span {
+  background: #d89b35;
+}
+
+.receipt {
+  overflow: hidden;
+  border: 1px solid #e5e9e0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 18px 55px rgba(35, 59, 44, 0.07);
+}
+
+.receiptHeader {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
+  gap: 18px;
+  padding: 28px 30px;
+  border-bottom: 1px solid #edf0eb;
 }
 
-.receiptRow:last-child {
-  border-bottom: none;
+.receiptHeader h2 {
+  margin: 0;
+  color: #293d30;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  font-weight: 500;
 }
 
-.receiptRow span {
-  color: #666;
+.bookingNumber {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: right;
 }
 
-.statusBadge {
-  text-transform: capitalize;
-  color: #2e7d32;
-  background: #eef6ed;
-  padding: 2px 8px;
-  border-radius: 6px;
+.bookingNumber span,
+.propertyLabel,
+.detail span,
+.reference span {
+  color: #89948a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+
+.bookingNumber strong {
+  color: #315b3c;
+  font-size: 20px;
+}
+
+.property {
+  display: flex;
+  gap: 20px;
+  padding: 25px 30px;
+  border-bottom: 1px solid #edf0eb;
+}
+
+.property img {
+  width: 190px;
+  height: 145px;
+  flex: 0 0 190px;
+  border-radius: 13px;
+  object-fit: cover;
+  background: #edf0eb;
+}
+
+.propertyInfo {
+  align-self: center;
+}
+
+.propertyInfo h3 {
+  margin: 8px 0 5px;
+  color: #263c2d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 23px;
+  font-weight: 500;
+}
+
+.propertyInfo p {
+  margin: 0 0 12px;
+  color: #798379;
   font-size: 12px;
 }
 
-.actionRow {
+.roomType {
+  display: inline-flex;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #f0f4ed;
+  color: #47634b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 18px;
+  padding: 28px 30px;
+  border-bottom: 1px solid #edf0eb;
+}
+
+.detail {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.detail strong {
+  overflow-wrap: anywhere;
+  color: #344638;
+  font-size: 13px;
+}
+
+.bookingStatus {
+  text-transform: capitalize;
+}
+
+.paymentSummary {
+  margin: 25px 30px;
+  padding: 21px;
+  border-radius: 13px;
+  background: #f7f8f4;
+}
+
+.paymentSummary h3 {
+  margin: 0 0 15px;
+  color: #2d4433;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.paymentRow,
+.totalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e8ece5;
+  font-size: 12px;
+}
+
+.paymentRow span {
+  color: #788378;
+}
+
+.paymentRow strong {
+  color: #354a38;
+  text-align: right;
+}
+
+.paidText {
+  color: #347044 !important;
+}
+
+.pendingText {
+  color: #a16e1f !important;
+}
+
+.totalRow {
+  margin-top: 5px;
+  padding-top: 17px;
+  border-bottom: 0;
+}
+
+.totalRow span {
+  color: #526352;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.totalRow strong {
+  color: #244c34;
+  font-size: 23px;
+}
+
+.reference {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 30px 22px;
+  padding: 15px;
+  border: 1px dashed #d7dfd4;
+  border-radius: 10px;
+}
+
+.reference strong {
+  overflow-wrap: anywhere;
+  color: #4a5e4b;
+  font-size: 12px;
+}
+
+.notice {
+  margin: 0 30px 24px;
+  padding: 15px 17px;
+  border-left: 3px solid #799574;
+  background: #f2f6f0;
+}
+
+.notice strong {
+  color: #3c6042;
+  font-size: 12px;
+}
+
+.notice p {
+  margin: 6px 0 0;
+  color: #778477;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 12px;
+  padding: 0 30px 30px;
 }
 
-.primaryBtn, .secondaryBtn {
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
+.primaryButton,
+.secondaryButton {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: 0.2s ease;
 }
 
-.primaryBtn {
-  background: #1a1a1a;
+.primaryButton {
+  background: #284d36;
   color: #fff;
-  border: none;
 }
 
-.primaryBtn:hover {
-  background: #333;
+.primaryButton:hover {
+  background: #1c3d29;
+  transform: translateY(-1px);
 }
 
-.secondaryBtn {
-  background: transparent;
-  color: #1a1a1a;
-  border: 1px solid #dcd8d0;
+.secondaryButton {
+  border-color: #dce3d9;
+  background: #fff;
+  color: #36513b;
 }
 
-.secondaryBtn:hover {
-  background: #f5f4f0;
+.secondaryButton:hover {
+  background: #f4f7f2;
+}
+
+.footerNote {
+  margin: 25px 0 0;
+  color: #849084;
+  font-size: 11px;
+  text-align: center;
+}
+
+.loadingCard,
+.errorCard {
+  width: min(100%, 510px);
+  padding: 45px 35px;
+  border: 1px solid #e4e9e1;
+  border-radius: 20px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 18px 55px rgba(35, 59, 44, 0.07);
+}
+
+.loadingCard p:not(.eyebrow),
+.errorCard > p {
+  color: #758075;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.loader {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 24px;
+  border: 3px solid #e7eee4;
+  border-top-color: #3d7048;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.helpText {
+  margin: 15px 0 24px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff5e9;
+  color: #8a672f !important;
+  font-size: 11px !important;
+}
+
+.errorCard .actions {
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .main {
+    width: min(100% - 24px, 900px);
+    padding-top: 30px;
+  }
+
+  .receiptHeader {
+    align-items: flex-start;
+    padding: 22px 18px;
+  }
+
+  .receiptHeader h2 {
+    font-size: 20px;
+  }
+
+  .bookingNumber strong {
+    font-size: 16px;
+  }
+
+  .property {
+    flex-direction: column;
+    padding: 20px 18px;
+  }
+
+  .property img {
+    width: 100%;
+    height: 190px;
+    flex-basis: auto;
+  }
+
+  .detailsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 22px 18px;
+  }
+
+  .paymentSummary {
+    margin: 20px 18px;
+    padding: 17px;
+  }
+
+  .reference,
+  .notice {
+    margin-right: 18px;
+    margin-left: 18px;
+  }
+
+  .receipt > .actions {
+    padding: 0 18px 22px;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
 }

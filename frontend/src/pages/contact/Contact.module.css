@@ -1,0 +1,214 @@
+.page {
+  min-height: 100vh;
+  background: #f7f8f3;
+  color: #283d2e;
+}
+
+.container {
+  width: min(1100px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 60px 0 85px;
+}
+
+.intro {
+  max-width: 700px;
+  margin-bottom: 38px;
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: #9a8054;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.intro h1 {
+  margin: 0;
+  color: #263e2e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 5vw, 56px);
+  font-weight: 500;
+}
+
+.intro > p {
+  max-width: 570px;
+  color: #7c887c;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.infoCard,
+.formCard {
+  padding: 30px;
+  border: 1px solid #e4e9e0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(35, 56, 39, 0.04);
+}
+
+.infoCard {
+  background: #294832;
+  color: #fff;
+}
+
+.infoCard .eyebrow {
+  color: #d2bd94;
+}
+
+.infoCard h2,
+.formCard h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.infoCard > p {
+  margin: 12px 0 27px;
+  color: #d0dbce;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.infoItem {
+  display: flex;
+  gap: 13px;
+  padding: 17px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.infoItem > span {
+  color: #d3bd92;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.infoItem strong {
+  color: #fff;
+  font-size: 12px;
+}
+
+.infoItem p {
+  margin: 5px 0 0;
+  color: #c6d2c4;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.formCard .eyebrow {
+  margin-bottom: 7px;
+}
+
+.formCard h2 {
+  margin-bottom: 22px;
+  color: #2e4935;
+}
+
+.formCard form {
+  display: grid;
+  gap: 15px;
+}
+
+.formCard label {
+  display: grid;
+  gap: 7px;
+  color: #596a5b;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.formCard input,
+.formCard textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #e0e6dd;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: #334638;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.formCard input {
+  min-height: 44px;
+}
+
+.formCard textarea {
+  resize: vertical;
+}
+
+.formCard input:focus,
+.formCard textarea:focus {
+  border-color: #719477;
+  box-shadow: 0 0 0 3px rgba(71, 123, 79, 0.1);
+}
+
+.formCard button {
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 8px;
+  background: #315b3c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.formCard button:hover {
+  background: #24482f;
+}
+
+.formCard button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success,
+.error {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.success {
+  background: #edf7ec;
+  color: #397246;
+}
+
+.error {
+  background: #fff0ed;
+  color: #a44d42;
+}
+
+@media (max-width: 760px) {
+  .container {
+    padding-top: 35px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .infoCard,
+  .formCard {
+    padding: 23px;
+  }
+}
