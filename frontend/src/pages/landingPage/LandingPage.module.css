@@ -618,3 +618,107 @@
     scroll-behavior: auto !important;
   }
 }
+
+.stayCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e7eae2;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 5px 22px rgba(32, 51, 37, 0.045);
+  transition:
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.stayCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 42px rgba(32, 51, 37, 0.11);
+}
+
+.stayImageWrapper {
+  position: relative;
+  height: clamp(230px, 22vw, 310px);
+  overflow: hidden;
+  background: #e5e9df;
+}
+
+.stayInfo {
+  padding: 22px;
+}
+
+.ratingBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #315b3c;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.favouriteButton {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.96);
+  color: #315b3c;
+  cursor: pointer;
+  font-size: 23px;
+  line-height: 1;
+  transition:
+    color 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.favouriteButton:hover {
+  transform: scale(1.08);
+}
+
+.favouriteActive {
+  color: #b34c46;
+}
+
+.amenities span {
+  padding: 7px 10px;
+  border: 1px solid #e8ede4;
+  border-radius: 30px;
+  background: #f4f7f1;
+  color: #53645a;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.viewButton {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 7px;
+  background: #315b3c;
+  color: #fff;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+  transition: background 160ms ease;
+}
+
+.viewButton:hover {
+  background: #203e2b;
+}
